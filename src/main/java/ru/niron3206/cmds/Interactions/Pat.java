@@ -8,18 +8,18 @@ import ru.niron3206.cmds.ICommand;
 
 import java.util.Random;
 
-public class Hug implements ICommand {
+public class Pat implements ICommand {
 
     @Override
     public void handle(CommandContext ctx) {
         String[] args = ctx.getArgs();
         MessageReceivedEvent event = ctx.getEvent();
         Random random = new Random();
-        EmbedBuilder hug = new EmbedBuilder();
+        EmbedBuilder pat = new EmbedBuilder();
 
         if(args.length == 1){
-            hug.setTitle(":red_circle: Ты должен упомянуть того человека, которого хочешь обнять!");
-            hug.setColor(0xd60012);
+            pat.setTitle(":red_circle: Ты должен упомянуть того человека, которого хочешь погладить по голове!");
+            pat.setColor(0xd60012);
         } else {
             try {
 
@@ -32,22 +32,21 @@ public class Hug implements ICommand {
                 }
 
                 assert member != null;
-                hug.setTitle("Неожиданные обнимашки!");
-                hug.setDescription(event.getAuthor().getAsMention() + " *обнимает* " + member.getAsMention());
-                hug.setImage(String.format("https://cdn.nekos.life/hug/hug_0%02d.gif", random.nextInt(89) + 1));
+                pat.setTitle("Время пэтта!");
+                pat.setDescription(event.getAuthor().getAsMention() + " *гладит по голове* " +   member.getAsMention());
+                pat.setImage(String.format("https://cdn.nekos.life/pat/pat_0%02d.gif", random.nextInt(73) + 1));
 
             } catch (Exception err) {
-                hug.setTitle(":red_circle: Ты должен упомянуть того человека, которого хочешь обнять!");
-                hug.setColor(0xd60012);
+                pat.setTitle(":red_circle: Ты должен упомянуть того человека, которого хочешь погладить по голове!");
+                pat.setColor(0xd60012);
             }
         }
-        event.getChannel().sendMessageEmbeds(hug.build()).queue();
-        hug.clear();
+        event.getChannel().sendMessageEmbeds(pat.build()).queue();
+        pat.clear();
     }
 
     @Override
     public String getName() {
-        return "hug";
+        return "pat";
     }
-
 }
