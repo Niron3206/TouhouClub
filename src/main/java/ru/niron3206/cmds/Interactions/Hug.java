@@ -34,7 +34,7 @@ public class Hug implements ICommand {
                 assert member != null;
                 hug.setTitle("Неожиданные обнимашки!");
                 hug.setDescription(event.getAuthor().getAsMention() + " *обнимает* " + member.getAsMention());
-                hug.setImage(String.format("https://cdn.nekos.life/hug/hug_0%02d.gif", random.nextInt(89) + 1));
+                hug.setImage(String.format("https://cdn.nekos.life/hug/hug_0%02d.gif", random.nextInt(88) + 1));
 
             } catch (Exception err) {
                 hug.setTitle(":red_circle: Ты должен упомянуть того человека, которого хочешь обнять!");
