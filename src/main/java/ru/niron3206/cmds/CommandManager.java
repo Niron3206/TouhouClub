@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import ru.niron3206.Config;
 import ru.niron3206.cmds.Interactions.Hug;
 import ru.niron3206.cmds.Interactions.Pat;
+import ru.niron3206.cmds.Interactions.Slap;
 import ru.niron3206.cmds.OwO.OwOCommand;
 
 import java.util.ArrayList;
@@ -17,6 +18,7 @@ public class CommandManager {
         addCommand(new OwOCommand());
         addCommand(new Hug());
         addCommand(new Pat());
+        addCommand(new Slap());
     }
 
     private void addCommand(ICommand cmd) {
