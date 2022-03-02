@@ -55,8 +55,6 @@ public class CommandManager {
         ICommand cmd = this.getCommand(invoke);
 
         if(cmd != null) {
-            event.getChannel().sendTyping().queue();
-
             CommandContext ctx = new CommandContext(event, args);
 
             cmd.handle(ctx);
