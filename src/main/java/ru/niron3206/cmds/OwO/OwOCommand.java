@@ -36,8 +36,7 @@ public class OwOCommand implements ICommand {
                     }
                 }
             }
-
-            event.getChannel().sendMessage(msg.finalMessage).queue();
+            event.getMessage().reply(msg.finalMessage).queue();
         }
     }
 
