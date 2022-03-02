@@ -36,13 +36,7 @@ public class Hug implements ICommand {
             } else {
                 hug.setTitle("Неожиданные обнимашки!");
                 hug.setDescription(event.getAuthor().getAsMention() + " *обнимает* " + member.getAsMention());
-                int image = random.nextInt(89) + 1;
-                if (image > 10) {
-                    hug.setImage("https://cdn.nekos.life/hug/hug_0" + image + ".gif");
-                } else {
-                    hug.setImage("https://cdn.nekos.life/hug/hug_00" + image + ".gif");
-                }
-
+                hug.setImage(String.format("https://cdn.nekos.life/hug/hug_0%02d.gif", random.nextInt(89) + 1));
             }
         }
         event.getChannel().sendMessageEmbeds(hug.build()).queue();
