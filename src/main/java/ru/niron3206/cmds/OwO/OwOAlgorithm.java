@@ -107,6 +107,17 @@ public class OwOAlgorithm {
                     }
                 }
             }
+
+            //Randomly replace 'ч' with "ть".
+            if((preMsg.charAt(i) == 'ч') || (preMsg.charAt(i) == 'Ч')) {
+                if(preMsg.charAt(i-1) != ' ') {
+                    if(random.nextInt(2) == 1) {
+                        sb.replace(i, i+1, "ть");
+                        preMsg = sb.toString();
+                    }
+                }
+            }
+
         }
 
         //Substitute chars 'l' and 'r' with 'w'.
