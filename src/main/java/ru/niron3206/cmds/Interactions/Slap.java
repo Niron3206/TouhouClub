@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import ru.niron3206.cmds.CommandContext;
 import ru.niron3206.cmds.ICommand;
 
+import java.awt.Color;
 import java.util.Random;
 
 public class Slap implements ICommand {
@@ -35,6 +36,7 @@ public class Slap implements ICommand {
                 slap.setTitle("Время ударить кого-то по щеке!");
                 slap.setDescription(event.getAuthor().getAsMention() + " *даёт пощёчину* " +   member.getAsMention());
                 slap.setImage(String.format("https://cdn.nekos.life/slap/slap_0%02d.gif", random.nextInt(15) + 1));
+                slap.setColor(new Color(random.nextInt(255), random.nextInt(255), random.nextInt(255)).getRGB());
 
             } catch (Exception err) {
                 slap.setTitle(":red_circle: Ты должен упомянуть того человека, которого хочешь ударить по щеке!");
