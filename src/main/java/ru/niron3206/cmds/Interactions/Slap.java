@@ -32,13 +32,17 @@ public class Slap implements ICommand {
                     default -> member = event.getGuild().getMemberById(args[1].replace("<@", "").replace(">", ""));
                 }
 
-                assert member != null;
-                slap.setTitle("Время ударить кого-то по щеке!");
-                slap.setDescription(event.getAuthor().getAsMention() + " *даёт пощёчину* " +   member.getAsMention());
-                slap.setImage(String.format("https://cdn.nekos.life/slap/slap_0%02d.gif", random.nextInt(15) + 1));
-                slap.setColor(new Color(random.nextInt(255), random.nextInt(255), random.nextInt(255)).getRGB());
+                if (member == null) {
+                    slap.setTitle(":red_circle: Ты должен упомянуть того человека, которого хочешь обнять!");
+                    slap.setColor(0xd60012);
+                } else {
+                    slap.setTitle("Время ударить кого-то по щеке!");
+                    slap.setDescription(event.getAuthor().getAsMention() + " *даёт пощёчину* " +   member.getAsMention());
+                    slap.setImage(String.format("https://cdn.nekos.life/slap/slap_0%02d.gif", random.nextInt(15) + 1));
+                    slap.setColor(new Color(random.nextInt(255), random.nextInt(255), random.nextInt(255)).getRGB());
+                }
 
-            } catch (Exception err) {
+            } catch (StringIndexOutOfBoundsException err) {
                 slap.setTitle(":red_circle: Ты должен упомянуть того человека, которого хочешь ударить по щеке!");
                 slap.setColor(0xd60012);
             }

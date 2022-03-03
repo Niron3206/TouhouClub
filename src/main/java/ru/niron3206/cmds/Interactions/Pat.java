@@ -32,13 +32,17 @@ public class Pat implements ICommand {
                     default -> member = event.getGuild().getMemberById(args[1].replace("<@", "").replace(">", ""));
                 }
 
-                assert member != null;
-                pat.setTitle("Время пэтта!");
-                pat.setDescription(event.getAuthor().getAsMention() + " *гладит по голове* " +   member.getAsMention());
-                pat.setImage(String.format("https://cdn.nekos.life/pat/pat_0%02d.gif", random.nextInt(73) + 1));
-                pat.setColor(new Color(random.nextInt(255), random.nextInt(255), random.nextInt(255)).getRGB());
+                if (member == null) {
+                    pat.setTitle(":red_circle: Ты должен упомянуть того человека, которого хочешь обнять!");
+                    pat.setColor(0xd60012);
+                } else {
+                    pat.setTitle("Время пэтта!");
+                    pat.setDescription(event.getAuthor().getAsMention() + " *гладит по голове* " +   member.getAsMention());
+                    pat.setImage(String.format("https://cdn.nekos.life/pat/pat_0%02d.gif", random.nextInt(73) + 1));
+                    pat.setColor(new Color(random.nextInt(255), random.nextInt(255), random.nextInt(255)).getRGB());
+                }
 
-            } catch (Exception err) {
+            } catch (StringIndexOutOfBoundsException err) {
                 pat.setTitle(":red_circle: Ты должен упомянуть того человека, которого хочешь погладить по голове!");
                 pat.setColor(0xd60012);
             }

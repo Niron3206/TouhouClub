@@ -32,13 +32,17 @@ public class Hug implements ICommand {
                     default -> member = event.getGuild().getMemberById(args[1].replace("<@", "").replace(">", ""));
                 }
 
-                assert member != null;
-                hug.setTitle("Неожиданные обнимашки!");
-                hug.setDescription(event.getAuthor().getAsMention() + " *обнимает* " + member.getAsMention());
-                hug.setImage(String.format("https://cdn.nekos.life/hug/hug_0%02d.gif", random.nextInt(88) + 1));
-                hug.setColor(new Color(random.nextInt(255), random.nextInt(255), random.nextInt(255)).getRGB());
+                if (member == null) {
+                    hug.setTitle(":red_circle: Ты должен упомянуть того человека, которого хочешь обнять!");
+                    hug.setColor(0xd60012);
+                } else {
+                    hug.setTitle("Неожиданные обнимашки!");
+                    hug.setDescription(event.getAuthor().getAsMention() + " *обнимает* " + member.getAsMention());
+                    hug.setImage(String.format("https://cdn.nekos.life/hug/hug_0%02d.gif", random.nextInt(88) + 1));
+                    hug.setColor(new Color(random.nextInt(255), random.nextInt(255), random.nextInt(255)).getRGB());
+                }
 
-            } catch (Exception err) {
+            } catch (StringIndexOutOfBoundsException err) {
                 hug.setTitle(":red_circle: Ты должен упомянуть того человека, которого хочешь обнять!");
                 hug.setColor(0xd60012);
             }
