@@ -19,7 +19,7 @@ public class OwOAlgorithm {
         char[] consonants = new char[] {'c', 'h', 'g', 'b', 'k', 'm', 'r', 't', 'w', 'd'};
         String[] endPhrases = new String[] {", nya~", ", owo~", ", -w-"};
 
-        //Converts String massive in String.
+        //Converts String array in String.
         for (int i = 1; i < msg.length; i++) {
             sb.append(" " + msg[i]);
         }
