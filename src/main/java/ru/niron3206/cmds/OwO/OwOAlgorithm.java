@@ -19,7 +19,7 @@ public class OwOAlgorithm {
         char[] consonants = new char[] {'c', 'h', 'g', 'b', 'k', 'm', 'r', 't', 'w', 'd'};
         String[] endPhrases = new String[] {", nya~", ", owo~", ", -w-"};
 
-        //Converts String massive in String.
+        //Converts String array in String.
         for (int i = 1; i < msg.length; i++) {
             sb.append(" " + msg[i]);
         }
@@ -58,9 +58,9 @@ public class OwOAlgorithm {
         preMsg = preMsg.replace('R', 'W').replace('r', 'w');
 
         //Randomly add end phrases at the end from endPhrases massive.
-        if(random.nextInt(2) != 1) {
+        if(random.nextInt(2) != 1)
             finalMessage = preMsg;
-        } else {
+        else {
             finalMessage = preMsg + endPhrases[random.nextInt(endPhrases.length)];
         }
 
@@ -125,9 +125,9 @@ public class OwOAlgorithm {
         preMsg = preMsg.replace('Р', 'В').replace('р', 'в');
 
         //Randomly add end phrases at the end from endPhrases array.
-        if(random.nextInt(2) != 1) {
+        if(random.nextInt(2) != 1)
             finalMessage = preMsg;
-        } else {
+        else {
             finalMessage = preMsg + endPhrases[random.nextInt(endPhrases.length)];
         }
 

@@ -12,31 +12,35 @@ public class OwOCommand implements ICommand {
 
     @Override
     public void handle(CommandContext ctx) {
-
-        String[] args = ctx.getArgs();
         MessageReceivedEvent event = ctx.getEvent();
-        OwOAlgorithm msg = new OwOAlgorithm(args);
-        EmbedBuilder hug = new EmbedBuilder();
 
-        if (args.length < 2) {
-            hug.setTitle(":red_circle: Мне нужно сообщения для перевода....бака~");
-            hug.setColor(0xd60012);
-            event.getChannel().sendMessageEmbeds(hug.build()).queue();
-            hug.clear();
-        } else {
-            for (int i = 1; i < args.length; i++) {
-                for (char en : en_ENG) {
-                    if (args[i].charAt(0) == en) {
-                        msg.engOwOAlgorithm();
+        if(event.getMessage().getReferencedMessage() != null)
+            new OwOReplyCommand().OwOReplyCommand(ctx.getEvent());
+        else {
+            String[] args = ctx.getArgs();
+            OwOAlgorithm msg = new OwOAlgorithm(args);
+            EmbedBuilder error = new EmbedBuilder();
+
+            if (args.length < 2) {
+                error.setTitle(":red_circle: Мне нужно сообщения для перевода....бака~");
+                error.setColor(0xd60012);
+                event.getChannel().sendMessageEmbeds(error.build()).queue();
+                error.clear();
+            } else {
+                for (int i = 1; i < args.length; i++) {
+                    for (char en : en_ENG) {
+                        if (args[i].charAt(0) == en) {
+                            msg.engOwOAlgorithm();
+                        }
+                    }
+                    for (char ru : ru_RU) {
+                        if (args[i].charAt(0) == ru) {
+                            msg.rusOwOAlgorithm();
+                        }
                     }
                 }
-                for (char ru : ru_RU) {
-                    if (args[i].charAt(0) == ru) {
-                        msg.rusOwOAlgorithm();
-                    }
-                }
+                event.getMessage().reply(msg.finalMessage).queue();
             }
-            event.getMessage().reply(msg.finalMessage).queue();
         }
     }
 

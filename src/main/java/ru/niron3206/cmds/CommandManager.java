@@ -2,11 +2,8 @@ package ru.niron3206.cmds;
 
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import ru.niron3206.Config;
-import ru.niron3206.cmds.Interactions.Hug;
-import ru.niron3206.cmds.Interactions.Pat;
-import ru.niron3206.cmds.Interactions.Slap;
+import ru.niron3206.cmds.Interactions.*;
 import ru.niron3206.cmds.OwO.OwOCommand;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
