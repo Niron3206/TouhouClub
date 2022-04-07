@@ -52,6 +52,11 @@ public class Slap implements ICommand {
     }
 
     @Override
+    public String getHelp() {
+        return "Если вы хотите выразить свои эмоции без мата, то используйте эту команду.";
+    }
+
+    @Override
     public String getName() {
         return "slap";
     }

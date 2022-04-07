@@ -1,7 +1,7 @@
 package ru.niron3206.cmds.OwO.alphabets;
 
 public class en_ENG {
-    public static char[] en_ENG = new char[] {
+    public final static char[] en_ENG = new char[] {
             'a', 'A',
             'b', 'B',
             'c', 'C',

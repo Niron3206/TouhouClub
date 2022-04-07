@@ -5,6 +5,8 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import ru.niron3206.cmds.CommandContext;
 import ru.niron3206.cmds.ICommand;
 
+import java.util.List;
+
 import static ru.niron3206.cmds.OwO.alphabets.en_ENG.en_ENG;
 import static ru.niron3206.cmds.OwO.alphabets.ru_RU.ru_RU;
 
@@ -45,7 +47,17 @@ public class OwOCommand implements ICommand {
     }
 
     @Override
+    public String getHelp() {
+        return "Делает вашу речь как у неко! Вы также можете ответить этой командой на чьё-либо сообщение.";
+    }
+
+    @Override
     public String getName() {
         return "owo";
+    }
+
+    @Override
+    public List<String> getAliases(){
+        return List.of("w", "OwO");
     }
 }

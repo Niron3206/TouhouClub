@@ -52,6 +52,11 @@ public class Pat implements ICommand {
     }
 
     @Override
+    public String getHelp() {
+        return "Хотите кого-то погладить по голове? То это команда для вас!";
+    }
+
+    @Override
     public String getName() {
         return "pat";
     }

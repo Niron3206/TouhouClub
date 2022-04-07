@@ -12,6 +12,7 @@ public class CommandManager {
     private final List<ICommand> commands = new ArrayList<>();
 
     public CommandManager() {
+        addCommand(new HelpCommand(this));
         addCommand(new OwOCommand());
         addCommand(new Hug());
         addCommand(new Pat());
@@ -32,7 +33,11 @@ public class CommandManager {
         commands.add(cmd);
     }
 
-    private ICommand getCommand(String search) {
+    public List<ICommand> getCommands() {
+        return commands;
+    }
+
+    public ICommand getCommand(String search) {
         String searchLower = search.toLowerCase();
 
         for(ICommand cmd : this.commands) {

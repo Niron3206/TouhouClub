@@ -52,6 +52,11 @@ public class Hug implements ICommand {
     }
 
     @Override
+    public String getHelp() {
+        return "Обнимашки всегда выглядят мило! Если вы хотите кого-то обнять, то используйте эту команду.";
+    }
+
+    @Override
     public String getName() {
         return "hug";
     }

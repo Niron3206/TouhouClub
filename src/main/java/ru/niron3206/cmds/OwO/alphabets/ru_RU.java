@@ -1,7 +1,7 @@
 package ru.niron3206.cmds.OwO.alphabets;
 
 public class ru_RU {
-    public static char[] ru_RU = new char[] {
+    public final static char[] ru_RU = new char[] {
             'а', 'А',
             'б', 'Б',
             'в', 'В',
