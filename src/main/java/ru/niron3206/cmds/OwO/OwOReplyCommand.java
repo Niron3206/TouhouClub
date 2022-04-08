@@ -11,7 +11,7 @@ public class OwOReplyCommand  {
 
         String[] args = event.getMessage().getReferencedMessage().getContentRaw().split("\\s+");
 
-        String newArgs[] = new String[args.length + 1];
+        String[] newArgs = new String[args.length + 1];
         for (int i = 0; i < args.length + 1; i++) {
             if (i == 0)
                 newArgs[i] = "owo";
@@ -33,7 +33,7 @@ public class OwOReplyCommand  {
                 }
             }
         }
-        event.getMessage().reply(msg.finalMessage).queue();
+        event.getMessage().reply(msg.getFinalMessage()).queue();
     }
     
 }

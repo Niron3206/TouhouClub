@@ -4,24 +4,24 @@ import java.util.Random;
 
 public class OwOAlgorithm {
 
-    public String[] msg;
-    public String finalMessage;
+    private final String[] msg;
+    private String finalMessage;
 
     public OwOAlgorithm(String[] msg) {
         this.msg = msg;
     }
 
-    public String engOwOAlgorithm() {
+    public void engOwOAlgorithm() {
 
         Random random = new Random();
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         char[] vowels = new char[] {'a', 'e', 'i', 'o', 'u'};
         char[] consonants = new char[] {'c', 'h', 'g', 'b', 'k', 'm', 'r', 't', 'w', 'd'};
         String[] endPhrases = new String[] {", nya~", ", owo~", ", -w-"};
 
         //Converts String array in String.
         for (int i = 1; i < msg.length; i++) {
-            sb.append(" " + msg[i]);
+            sb.append(" ").append(msg[i]);
         }
         String preMsg = sb.toString();
 
@@ -64,19 +64,18 @@ public class OwOAlgorithm {
             finalMessage = preMsg + endPhrases[random.nextInt(endPhrases.length)];
         }
 
-        return finalMessage;
     }
 
-    public String rusOwOAlgorithm () {
+    public void rusOwOAlgorithm () {
         Random random = new Random();
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         char[] vowels = new char[] {'е', 'и', 'о', 'у'};
         char[] consonants = new char[] {'с', 'х', 'г', 'б', 'к', 'м', 'р', 'т', 'в', 'д'};
         String[] endPhrases = new String[] {", нья~", ", owo~", ", -w-"};
 
         //Converts String array in String.
         for (int i = 1; i < msg.length; i++) {
-            sb.append(" " + msg[i]);
+            sb.append(" ").append(msg[i]);
         }
         String preMsg = sb.toString();
 
@@ -131,6 +130,9 @@ public class OwOAlgorithm {
             finalMessage = preMsg + endPhrases[random.nextInt(endPhrases.length)];
         }
 
+    }
+
+    public String getFinalMessage(){
         return finalMessage;
     }
 }
