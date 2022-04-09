@@ -17,7 +17,7 @@ public class OwOAlgorithm {
         StringBuilder sb = new StringBuilder();
         char[] vowels = new char[] {'a', 'e', 'i', 'o', 'u'};
         char[] consonants = new char[] {'c', 'h', 'g', 'b', 'k', 'm', 'r', 't', 'w', 'd'};
-        String[] endPhrases = new String[] {", nya~", ", owo~", ", -w-"};
+        String[] endPhrases = new String[] {"nya~", "owo~", "-w-"};
 
         //Converts String array in String.
         for (int i = 1; i < msg.length; i++) {
@@ -61,9 +61,11 @@ public class OwOAlgorithm {
         if(random.nextInt(2) != 1)
             finalMessage = preMsg;
         else {
-            finalMessage = preMsg + endPhrases[random.nextInt(endPhrases.length)];
+            if (preMsg.endsWith(".")) {
+                preMsg = preMsg.substring(0, preMsg.length() - 1);
+            }
+            finalMessage = preMsg + ", " + endPhrases[random.nextInt(endPhrases.length)];
         }
-
     }
 
     public void rusOwOAlgorithm () {
@@ -71,7 +73,7 @@ public class OwOAlgorithm {
         StringBuilder sb = new StringBuilder();
         char[] vowels = new char[] {'е', 'и', 'о', 'у'};
         char[] consonants = new char[] {'с', 'х', 'г', 'б', 'к', 'м', 'р', 'т', 'в', 'д'};
-        String[] endPhrases = new String[] {", нья~", ", owo~", ", -w-"};
+        String[] endPhrases = new String[] {"нья~", "owo~", "-w-"};
 
         //Converts String array in String.
         for (int i = 1; i < msg.length; i++) {
@@ -127,9 +129,11 @@ public class OwOAlgorithm {
         if(random.nextInt(2) != 1)
             finalMessage = preMsg;
         else {
-            finalMessage = preMsg + endPhrases[random.nextInt(endPhrases.length)];
+            if (preMsg.endsWith(".")) {
+                preMsg = preMsg.substring(0, preMsg.length() - 1);
+            }
+            finalMessage = preMsg + ", " + endPhrases[random.nextInt(endPhrases.length)];
         }
-
     }
 
     public String getFinalMessage(){
