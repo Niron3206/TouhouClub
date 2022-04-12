@@ -58,14 +58,15 @@ public class OwOAlgorithm {
         preMsg = preMsg.replace('R', 'W').replace('r', 'w');
 
         //Randomly add end phrases at the end from endPhrases massive.
-        if(random.nextInt(2) != 1)
-            finalMessage = preMsg;
-        else {
-            if (preMsg.endsWith(".")) {
-                preMsg = preMsg.substring(0, preMsg.length() - 1);
+        char end = preMsg.charAt(preMsg.length() - 1);
+        if(random.nextInt(2) == 1) {
+            switch (end) {
+                case '!', '?' -> preMsg = preMsg + " " + endPhrases[random.nextInt(endPhrases.length)];
+                case '.' -> preMsg = preMsg.substring(0, preMsg.length() - 1);
+                default -> preMsg = preMsg + ", " + endPhrases[random.nextInt(endPhrases.length)];
             }
-            finalMessage = preMsg + ", " + endPhrases[random.nextInt(endPhrases.length)];
         }
+        finalMessage = preMsg;
     }
 
     public void rusOwOAlgorithm () {
@@ -126,14 +127,15 @@ public class OwOAlgorithm {
         preMsg = preMsg.replace('Р', 'В').replace('р', 'в');
 
         //Randomly add end phrases at the end from endPhrases array.
-        if(random.nextInt(2) != 1)
-            finalMessage = preMsg;
-        else {
-            if (preMsg.endsWith(".")) {
-                preMsg = preMsg.substring(0, preMsg.length() - 1);
+        char end = preMsg.charAt(preMsg.length() - 1);
+        if(random.nextInt(2) == 1) {
+            switch (end) {
+                case '!', '?' -> preMsg = preMsg + " " + endPhrases[random.nextInt(endPhrases.length)];
+                case '.' -> preMsg = preMsg.substring(0, preMsg.length() - 1);
+                default -> preMsg = preMsg + ", " + endPhrases[random.nextInt(endPhrases.length)];
             }
-            finalMessage = preMsg + ", " + endPhrases[random.nextInt(endPhrases.length)];
         }
+        finalMessage = preMsg;
     }
 
     public String getFinalMessage(){
