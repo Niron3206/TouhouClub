@@ -6,8 +6,8 @@ Every parameters, like "prefix" and "token" you should write in .env file.
 You can also build your own maven-jar-application and run it via command console.\
 To compile this maven project into jar file, write it in console (don't forget to install maven if you haven't downloaded it yet):
 
-`1. maven compile`\
-`2. maven package`
+`1. mvn compile`\
+`2. mvn package`
 
 You will see compiled jar file in target folder, you also need to copy your .env file with your parameters in target folder.
 
