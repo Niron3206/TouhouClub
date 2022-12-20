@@ -15,28 +15,27 @@ public class OwOCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) {
         MessageReceivedEvent event = ctx.getEvent();
-
         if(event.getMessage().getReferencedMessage() != null)
-            new OwOReplyCommand().OwOReplyCommand(ctx.getEvent());
+            OwOReplyCommand.setReplyEvent(event);
         else {
-            String[] args = ctx.getArgs();
+            List<String> args = ctx.getArgs();
             OwOAlgorithm msg = new OwOAlgorithm(args);
             EmbedBuilder error = new EmbedBuilder();
 
-            if (args.length < 2) {
+            if (args.size() < 2) {
                 error.setTitle(":red_circle: Мне нужно сообщения для перевода....бака~");
                 error.setColor(0xd60012);
                 event.getChannel().sendMessageEmbeds(error.build()).queue();
                 error.clear();
             } else {
-                for (int i = 1; i < args.length; i++) {
+                for (int i = 1; i < args.size(); i++) {
                     for (char en : en_ENG) {
-                        if (args[i].charAt(0) == en) {
+                        if (args.get(i).charAt(0) == en) {
                             msg.engOwOAlgorithm();
                         }
                     }
                     for (char ru : ru_RU) {
-                        if (args[i].charAt(0) == ru) {
+                        if (args.get(i).charAt(0) == ru) {
                             msg.rusOwOAlgorithm();
                         }
                     }

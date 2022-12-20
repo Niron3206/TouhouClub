@@ -1,13 +1,14 @@
 package ru.niron3206.cmds.OwO;
 
+import java.util.List;
 import java.util.Random;
 
 public class OwOAlgorithm {
 
-    private final String[] msg;
+    private final List<String> msg;
     private String finalMessage;
 
-    public OwOAlgorithm(String[] msg) {
+    public OwOAlgorithm(List<String> msg) {
         this.msg = msg;
     }
 
@@ -20,8 +21,8 @@ public class OwOAlgorithm {
         String[] endPhrases = new String[] {"nya~", "owo~", "-w-"};
 
         //Converts String array in String.
-        for (int i = 1; i < msg.length; i++) {
-            sb.append(" ").append(msg[i]);
+        for (int i = 1; i < msg.size(); i++) {
+            sb.append(" ").append(msg.get(i));
         }
         String preMsg = sb.toString();
 
@@ -77,11 +78,10 @@ public class OwOAlgorithm {
         String[] endPhrases = new String[] {"нья~", "owo~", "-w-"};
 
         //Converts String array in String.
-        for (int i = 1; i < msg.length; i++) {
-            sb.append(" ").append(msg[i]);
+        for (int i = 1; i < msg.size(); i++) {
+            sb.append(" ").append(msg.get(i));
         }
         String preMsg = sb.toString();
-
 
         for (int i = 0; i < preMsg.length(); i++) {
             //Put char 'y' after char 'n' and add string "ya" if char 'n' stands as last letter.

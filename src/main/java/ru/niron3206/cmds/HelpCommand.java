@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import ru.niron3206.Config;
 
 import java.awt.*;
+import java.util.List;
 import java.util.Random;
 
 public class HelpCommand implements ICommand{
@@ -18,24 +19,29 @@ public class HelpCommand implements ICommand{
     public void handle(CommandContext ctx) {
         EmbedBuilder embed = new EmbedBuilder();
         Random random = new Random();
-        String[] args = ctx.getArgs();
+        List<String> args = ctx.getArgs();
 
-        if(args.length == 1) {
+        if(args.size() == 0) {
             StringBuilder builder = new StringBuilder();
             embed.setTitle("Список команд:\n");
 
             manager.getCommands().stream().map(ICommand::getName).forEach(
-                    (it) -> builder.append("`").append(Config.get("PREFIX")).append(it).append("`\n")
+                    (name) -> {
+                        if(name.equals("hug")) builder.append("**ВЗАИМОДЕЙСТВИЯ:**\n");
+                        if(name.equals("play")) builder.append("**МУЗЫКА:**\n");
+                        builder.append("`").append(Config.get("PREFIX")).append(name).append("`\n");
+                    }
             );
 
             embed.setDescription(builder.toString());
+            embed.setFooter("*если вы хотите узнать, что делает та или иная команда, то введите ~help <команда из списка>");
             embed.setColor(new Color(random.nextInt(255), random.nextInt(255), random.nextInt(255)).getRGB());
             ctx.getEvent().getChannel().sendMessageEmbeds(embed.build()).queue();
             embed.clear();
             return;
         }
 
-        String search = args[1];
+        String search = args.get(0);
         ICommand command = manager.getCommand(search);
 
         if(command == null) {

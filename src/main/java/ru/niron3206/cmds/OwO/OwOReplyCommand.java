@@ -2,38 +2,33 @@ package ru.niron3206.cmds.OwO;
 
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static ru.niron3206.cmds.OwO.alphabets.en_ENG.en_ENG;
 import static ru.niron3206.cmds.OwO.alphabets.ru_RU.ru_RU;
 
 public class OwOReplyCommand  {
 
-    public void OwOReplyCommand(MessageReceivedEvent event) {
+    public static void setReplyEvent(MessageReceivedEvent event) {
 
-        String[] args = event.getMessage().getReferencedMessage().getContentRaw().split("\\s+");
+        List<String> args = new ArrayList<>(List.of(event.getMessage().getReferencedMessage().getContentRaw().split("\\s+")));
+        args.add(0, "owo");
 
-        String[] newArgs = new String[args.length + 1];
-        for (int i = 0; i < args.length + 1; i++) {
-            if (i == 0)
-                newArgs[i] = "owo";
-            else
-                newArgs[i] = args[i-1];
-        }
+        OwOAlgorithm msg = new OwOAlgorithm(args);
 
-        OwOAlgorithm msg = new OwOAlgorithm(newArgs);
-
-        for (int i = 1; i < newArgs.length; i++) {
+        for (int i = 1; i < args.size(); i++) {
             for (char en : en_ENG) {
-                if (newArgs[i].charAt(0) == en) {
+                if (args.get(i).charAt(0) == en) {
                     msg.engOwOAlgorithm();
                 }
             }
             for (char ru : ru_RU) {
-                if (newArgs[i].charAt(0) == ru) {
+                if (args.get(i).charAt(0) == ru) {
                     msg.rusOwOAlgorithm();
                 }
             }
         }
         event.getMessage().reply(msg.getFinalMessage()).queue();
     }
-    
 }
