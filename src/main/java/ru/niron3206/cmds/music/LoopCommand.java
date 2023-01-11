@@ -39,7 +39,7 @@ public class LoopCommand implements ICommand {
 
         musicManager.scheduler.looping = newLooping;
 
-        channel.sendMessageFormat("**%s**", newLooping ? "Проигрывание текущего трека поставлено на повторение" : "Повторные проигрывание текущего трека прекращены").queue();
+        channel.sendMessageFormat("**%s**", newLooping ? "Проигрывание текущего трека поставлено на повторение" : "Повторное проигрывание текущего трека прекращено").queue();
     }
 
     @Override

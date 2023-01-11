@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.managers.AudioManager;
+import ru.niron3206.audioplayer.AutoLeave;
 import ru.niron3206.cmds.CommandContext;
 import ru.niron3206.cmds.ICommand;
 import ru.niron3206.audioplayer.PlayerManager;
@@ -41,6 +42,7 @@ public class PlayCommand implements ICommand {
             AudioManager audioManager = ctx.getGuild().getAudioManager();
             channel.sendMessageFormat("Подключаюсь к `\uD83D\uDD0A %s`", memberChannel.getName()).queue();
             audioManager.openAudioConnection(memberChannel);
+            new AutoLeave(ctx.getGuild()).timer();
         }
 
         String link = String.join(" ", ctx.getArgs());

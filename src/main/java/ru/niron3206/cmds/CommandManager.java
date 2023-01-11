@@ -16,11 +16,11 @@ public class CommandManager {
     public CommandManager() {
         addCommand(new HelpCommand(this));
 
-        //addCommand(new OwOCommand());
-
         addCommand(new Hug());
         addCommand(new Pat());
         addCommand(new Slap());
+
+        //addCommand(new OwOCommand());
 
         //music
         addCommand(new PlayCommand());
