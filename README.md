@@ -1,4 +1,6 @@
 # TouhouClub
+![Downloads](https://img.shields.io/github/downloads/Niron3206/TouhouClub/v1.1/total?style=flat-square)
+
 This is local Java project for discord bot, based on JDA library.
 
 Every parameters, like "prefix" and "token" you should write in .env file.
