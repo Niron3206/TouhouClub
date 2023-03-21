@@ -1,9 +1,9 @@
 package ru.niron3206.cmds.music;
 
-import net.dv8tion.jda.api.entities.AudioChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.managers.AudioManager;
 import ru.niron3206.audioplayer.AutoLeave;
 import ru.niron3206.cmds.CommandContext;
@@ -19,7 +19,7 @@ public class PlayCommand implements ICommand {
 
     @Override
     public void handle(CommandContext ctx) {
-        TextChannel channel = ctx.getEvent().getTextChannel();
+        TextChannel channel = ctx.getEvent().getChannel().asTextChannel();
 
         if (ctx.getArgs() == null) {
             channel.sendMessage("Ничего не понял, вот как должно быть: `~play <ютуб ссылка>`").queue();
@@ -38,7 +38,7 @@ public class PlayCommand implements ICommand {
         }
 
         if (!selfVoiceState.inAudioChannel()) {
-            AudioChannel memberChannel = memberVoiceState.getChannel();
+            VoiceChannel memberChannel = memberVoiceState.getChannel().asVoiceChannel();
             AudioManager audioManager = ctx.getGuild().getAudioManager();
             channel.sendMessageFormat("Подключаюсь к `\uD83D\uDD0A %s`", memberChannel.getName()).queue();
             audioManager.openAudioConnection(memberChannel);

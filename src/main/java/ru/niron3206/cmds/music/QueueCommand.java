@@ -2,8 +2,8 @@ package ru.niron3206.cmds.music;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.requests.restaction.MessageAction;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 import ru.niron3206.audioplayer.MusicManager;
 import ru.niron3206.audioplayer.PlayerManager;
 import ru.niron3206.cmds.CommandContext;
@@ -18,7 +18,7 @@ public class QueueCommand implements ICommand {
 
     @Override
     public void handle(CommandContext ctx) {
-        TextChannel channel = ctx.getEvent().getTextChannel();
+        TextChannel channel = ctx.getEvent().getGuildChannel().asTextChannel();
         MusicManager musicManager = PlayerManager.getInstance().getMusicManager(ctx.getGuild());
         BlockingQueue<AudioTrack> queue = musicManager.scheduler.queue;
 
@@ -29,27 +29,27 @@ public class QueueCommand implements ICommand {
 
         int trackCount = Math.min(queue.size(), 20);
         List<AudioTrack> trackList = new ArrayList<>(queue);
-        MessageAction messageAction = channel.sendMessage("**Очередь:**\n");
+        MessageCreateAction messageAction = channel.sendMessage("**Очередь:**\n");
 
         for (int i = 0; i < trackCount; i++) {
             AudioTrack track = trackList.get(i);
             AudioTrackInfo info = track.getInfo();
 
-            messageAction.append('#')
-                    .append(String.valueOf(i + 1))
-                    .append(" `")
-                    .append(String.valueOf(info.title))
-                    .append("`\nАвтор: `")
-                    .append(info.author)
-                    .append("` [`")
-                    .append(formatTime(track.getDuration()))
-                    .append("`]\n");
+            messageAction.addContent("#")
+                    .addContent(String.valueOf(i + 1))
+                    .addContent(" `")
+                    .addContent(String.valueOf(info.title))
+                    .addContent("`\nАвтор: `")
+                    .addContent(info.author)
+                    .addContent("` [`")
+                    .addContent(formatTime(track.getDuration()))
+                    .addContent("`]\n");
         }
 
         if (trackList.size() > trackCount) {
-            messageAction.append("И `")
-                    .append(String.valueOf(trackList.size() - trackCount))
-                    .append("` более...");
+            messageAction.addContent("И `")
+                    .addContent(String.valueOf(trackList.size() - trackCount))
+                    .addContent("` более...");
         }
 
         messageAction.queue();

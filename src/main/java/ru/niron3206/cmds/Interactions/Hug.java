@@ -19,7 +19,7 @@ public class Hug implements ICommand {
 
         Member member;
         try {
-            member = event.getMessage().getMentionedMembers().get(0);
+            member = event.getMessage().getMentions().getMembers().get(0);
         } catch (IndexOutOfBoundsException e) {
             hug.setTitle(":red_circle: Ты должен упомянуть того человека, которого хочешь обнять!");
             hug.setColor(0xd60012);

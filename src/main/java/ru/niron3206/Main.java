@@ -17,7 +17,7 @@ public class Main {
     public static void main(String[] args) throws LoginException {
         jda = JDABuilder.createDefault(Config.get("TOKEN"))
                 .setActivity(Activity.listening("my master."))
-                .enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_VOICE_STATES)
+                .enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_VOICE_STATES, GatewayIntent.MESSAGE_CONTENT)
                 .enableCache(CacheFlag.VOICE_STATE)
                 .setMemberCachePolicy(MemberCachePolicy.ALL)
                 .setChunkingFilter(ChunkingFilter.ALL)

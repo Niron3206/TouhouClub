@@ -8,7 +8,7 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -45,10 +45,10 @@ public class PlayerManager {
                 musicManager.scheduler.queue(audioTrack);
 
                 channel.sendMessage("Добавляю в очередь: `")
-                        .append(audioTrack.getInfo().title)
-                        .append("`\nАвтор: `")
-                        .append(audioTrack.getInfo().author)
-                        .append("`")
+                        .addContent(audioTrack.getInfo().title)
+                        .addContent("`\nАвтор: `")
+                        .addContent(audioTrack.getInfo().author)
+                        .addContent("`")
                         .queue();
             }
 
@@ -58,10 +58,10 @@ public class PlayerManager {
                 musicManager.scheduler.queue(track);
 
                 channel.sendMessage("Добавляю в очередь: `")
-                        .append(track.getInfo().title)
-                        .append("`\nАвтор: `")
-                        .append(track.getInfo().author)
-                        .append("`")
+                        .addContent(track.getInfo().title)
+                        .addContent("`\nАвтор: `")
+                        .addContent(track.getInfo().author)
+                        .addContent("`")
                         .queue();
                 /*
                 List<AudioTrack> tracks = audioPlaylist.getTracks();

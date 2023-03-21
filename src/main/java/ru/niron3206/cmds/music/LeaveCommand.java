@@ -3,7 +3,7 @@ package ru.niron3206.cmds.music;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.managers.AudioManager;
 import ru.niron3206.audioplayer.MusicManager;
 import ru.niron3206.audioplayer.PlayerManager;
@@ -14,7 +14,7 @@ import ru.niron3206.cmds.ICommand;
 public class LeaveCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) {
-        TextChannel channel = ctx.getEvent().getTextChannel();
+        TextChannel channel = ctx.getEvent().getChannel().asTextChannel();
         Member self = ctx.getGuild().getSelfMember();
         GuildVoiceState selfVoiceState = self.getVoiceState();
 

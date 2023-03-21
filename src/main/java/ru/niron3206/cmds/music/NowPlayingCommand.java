@@ -5,7 +5,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import ru.niron3206.cmds.CommandContext;
 import ru.niron3206.cmds.ICommand;
 import ru.niron3206.audioplayer.MusicManager;
@@ -17,7 +17,7 @@ import java.util.List;
 public class NowPlayingCommand implements ICommand {
     @Override
     public void handle(CommandContext ctx) {
-        TextChannel channel = ctx.getEvent().getTextChannel();
+        TextChannel channel = ctx.getEvent().getChannel().asTextChannel();
         Member self = ctx.getGuild().getSelfMember();
         GuildVoiceState selfVoiceState = self.getVoiceState();
 
