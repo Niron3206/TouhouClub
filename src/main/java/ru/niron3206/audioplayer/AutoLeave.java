@@ -18,7 +18,9 @@ public class AutoLeave {
         TimerTask timerTask = new TimerTask() {
             @Override
             public void run() {
+
                 System.out.println("I'm in voice chat");
+
                 if (musicManager.audioPlayer.getPlayingTrack() == null
                         && musicManager.scheduler.queue.isEmpty()) {
                     musicManager.scheduler.looping = false;

@@ -8,6 +8,8 @@ import ru.niron3206.audioplayer.PlayerManager;
 import ru.niron3206.cmds.CommandContext;
 import ru.niron3206.cmds.ICommand;
 
+import java.util.List;
+
 @SuppressWarnings("ConstantConditions")
 public class LoopCommand implements ICommand {
     @Override
@@ -39,7 +41,7 @@ public class LoopCommand implements ICommand {
 
         musicManager.scheduler.looping = newLooping;
 
-        channel.sendMessageFormat("**%s**", newLooping ? "Проигрывание текущего трека поставлено на повторение" : "Повторное проигрывание текущего трека прекращено").queue();
+        channel.sendMessageFormat("**%s**", newLooping ? ":repeat: Повторное проигрывание включено" : "Повторное проигрывание выключено").queue();
     }
 
     @Override
@@ -48,7 +50,12 @@ public class LoopCommand implements ICommand {
     }
 
     @Override
+    public List<String> getAliases() {
+        return List.of("l", "L");
+    }
+
+    @Override
     public String getHelp() {
-        return "Ставит на повтор текущий трек";
+        return "Ставит на повтор текущий/последующие трек/и";
     }
 }
