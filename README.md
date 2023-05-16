@@ -1,5 +1,5 @@
 # TouhouClub
-![Downloads](https://img.shields.io/github/downloads/Niron3206/TouhouClub/v1.2/total?style=flat-square)
+![Downloads](https://img.shields.io/github/downloads/Niron3206/TouhouClub/v1.3/total?style=flat-square)
 
 This is local Java project for discord bot, based on JDA library.
 
