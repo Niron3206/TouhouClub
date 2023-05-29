@@ -22,7 +22,7 @@ public class NowPlayingCommand implements ICommand {
         GuildVoiceState selfVoiceState = self.getVoiceState();
 
         if (!selfVoiceState.inAudioChannel()) {
-            channel.sendMessage("Я должен находиться в голосовом канале!").queue();
+            channel.sendMessage("\uD83D\uDD34 Я должен находиться в голосовом канале!").queue();
             return;
         }
 
@@ -30,12 +30,12 @@ public class NowPlayingCommand implements ICommand {
         GuildVoiceState memberVoiceState = member.getVoiceState();
 
         if(!memberVoiceState.inAudioChannel()) {
-            channel.sendMessage("Ты должен зайти в голосовой канал, чтобы включить свою классную музычку!").queue();
+            channel.sendMessage("\uD83D\uDD34 Ты должен зайти в голосовой канал!").queue();
             return;
         }
 
         if(!memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
-            channel.sendMessage("Мы должны быть в одном и том же канале!").queue();
+            channel.sendMessage("\uD83D\uDD34 Мы должны быть в одном и том же канале!").queue();
             return;
         }
 
@@ -49,7 +49,7 @@ public class NowPlayingCommand implements ICommand {
         }
 
         AudioTrackInfo info = track.getInfo();
-        channel.sendMessageFormat("Сейчас играет: `%s`\nАвтор: `%s`\n(Ссылка: <%s>)", info.title, info.author, info.uri).queue();
+        channel.sendMessageFormat("\uD83C\uDFB5 Сейчас играет: `%s`\nАвтор: `%s`\n(Ссылка: <%s>)", info.title, info.author, info.uri).queue();
     }
 
     @Override

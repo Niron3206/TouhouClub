@@ -22,25 +22,25 @@ public class PlayCommand implements ICommand {
         TextChannel channel = ctx.getEvent().getChannel().asTextChannel();
 
         if (ctx.getArgs() == null) {
-            channel.sendMessage("Ничего не понял, вот как должно быть: `~play <ютуб ссылка>`").queue();
+            channel.sendMessage("\uD83D\uDD34 Ничего не понял, вот как должно быть: `~play <ютуб ссылка>`").queue();
+            return;
+        }
+
+        Member member = ctx.getEvent().getMember();
+        GuildVoiceState memberVoiceState = member.getVoiceState();
+
+        if(!memberVoiceState.inAudioChannel()) {
+            channel.sendMessage("\uD83D\uDD34 Ты должен зайти в голосовой канал!").queue();
             return;
         }
 
         Member self = ctx.getGuild().getSelfMember();
         GuildVoiceState selfVoiceState = self.getVoiceState();
 
-        Member member = ctx.getEvent().getMember();
-        GuildVoiceState memberVoiceState = member.getVoiceState();
-
-        if (!memberVoiceState.inAudioChannel()) {
-            channel.sendMessage("Ты должен зайти в голосовой канал, чтобы включить свою классную музычку!").queue();
-            return;
-        }
-
         if (!selfVoiceState.inAudioChannel()) {
             VoiceChannel memberChannel = memberVoiceState.getChannel().asVoiceChannel();
             AudioManager audioManager = ctx.getGuild().getAudioManager();
-            channel.sendMessageFormat("Подключаюсь к `\uD83D\uDD0A %s`", memberChannel.getName()).queue();
+            channel.sendMessageFormat("\uD83D\uDD0C Подключаюсь к `\uD83D\uDD0A %s`", memberChannel.getName()).queue();
             audioManager.openAudioConnection(memberChannel);
             new AutoLeave(ctx.getGuild()).timer();
         }

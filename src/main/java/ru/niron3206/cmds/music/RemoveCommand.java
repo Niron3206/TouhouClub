@@ -22,7 +22,7 @@ public class RemoveCommand implements ICommand {
         GuildVoiceState selfVoiceState = self.getVoiceState();
 
         if (!selfVoiceState.inAudioChannel()) {
-            channel.sendMessage("Я должен находиться в голосовом канале!").queue();
+            channel.sendMessage("\uD83D\uDD34 Я должен находиться в голосовом канале!").queue();
             return;
         }
 
@@ -30,12 +30,12 @@ public class RemoveCommand implements ICommand {
         GuildVoiceState memberVoiceState = member.getVoiceState();
 
         if(!memberVoiceState.inAudioChannel()) {
-            channel.sendMessage("Ты должен зайти в голосовой канал, чтобы включить свою классную музычку!").queue();
+            channel.sendMessage("\uD83D\uDD34 Ты должен зайти в голосовой канал!").queue();
             return;
         }
 
         if(!memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
-            channel.sendMessage("Мы должны быть в одном и том же канале!").queue();
+            channel.sendMessage("\uD83D\uDD34 Мы должны быть в одном и том же канале!").queue();
             return;
         }
 
@@ -43,7 +43,12 @@ public class RemoveCommand implements ICommand {
         BlockingQueue<AudioTrack> queue = musicManager.scheduler.queue;
         List<AudioTrack> trackList = new ArrayList<>(queue);
 
-        musicManager.scheduler.queue.remove(trackList.get(Integer.parseInt(ctx.getArgs().get(1)) - 1));
+        AudioTrack trackToDelete = trackList.get(Integer.parseInt(ctx.getArgs().get(0)) - 1);
+
+        musicManager.scheduler.queue.remove(trackToDelete);
+
+        channel.sendMessage("\uD83C\uDFB5 Трек `" + trackToDelete.getInfo().title + "` был удалён из очереди!").queue();
+
     }
 
     @Override

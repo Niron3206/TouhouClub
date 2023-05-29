@@ -18,7 +18,7 @@ public class StopCommand implements ICommand {
         GuildVoiceState selfVoiceState = self.getVoiceState();
 
         if (!selfVoiceState.inAudioChannel()) {
-            channel.sendMessage("Я должен находиться в голосовом канале!").queue();
+            channel.sendMessage("\uD83D\uDD34 Я должен находиться в голосовом канале!").queue();
             return;
         }
 
@@ -26,12 +26,12 @@ public class StopCommand implements ICommand {
         GuildVoiceState memberVoiceState = member.getVoiceState();
 
         if(!memberVoiceState.inAudioChannel()) {
-            channel.sendMessage("Ты должен зайти в голосовой канал, чтобы включить свою классную музычку!").queue();
+            channel.sendMessage("\uD83D\uDD34 Ты должен зайти в голосовой канал!").queue();
             return;
         }
 
         if(!memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
-            channel.sendMessage("Мы должны быть в одном и том же канале!").queue();
+            channel.sendMessage("\uD83D\uDD34 Мы должны быть в одном и том же канале!").queue();
             return;
         }
 
@@ -39,7 +39,7 @@ public class StopCommand implements ICommand {
         musicManager.scheduler.player.stopTrack();
         musicManager.scheduler.queue.clear();
 
-        channel.sendMessage("Проигрывание было прекращено и очередь из треков была очищена!").queue();
+        channel.sendMessage("\uD83E\uDDF9 Проигрывание было прекращено и очередь треков была очищена!").queue();
     }
 
     @Override

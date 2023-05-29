@@ -19,7 +19,7 @@ public class LeaveCommand implements ICommand {
         GuildVoiceState selfVoiceState = self.getVoiceState();
 
         if (!selfVoiceState.inAudioChannel()) {
-            channel.sendMessage("Я должен находиться в голосовом канале!").queue();
+            channel.sendMessage("\uD83D\uDD34 Я должен находиться в голосовом канале!").queue();
             return;
         }
 
@@ -27,12 +27,12 @@ public class LeaveCommand implements ICommand {
         GuildVoiceState memberVoiceState = member.getVoiceState();
 
         if(!memberVoiceState.inAudioChannel()) {
-            channel.sendMessage("Ты должен зайти в голосовой канал, чтобы включить свою классную музычку!").queue();
+            channel.sendMessage("\uD83D\uDD34 Ты должен зайти в голосовой канал!").queue();
             return;
         }
 
         if(!memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
-            channel.sendMessage("Мы должны быть в одном и том же канале!").queue();
+            channel.sendMessage("\uD83D\uDD34 Мы должны быть в одном и том же канале!").queue();
             return;
         }
 

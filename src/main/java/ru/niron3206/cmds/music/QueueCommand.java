@@ -2,6 +2,8 @@ package ru.niron3206.cmds.music;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
+import net.dv8tion.jda.api.entities.GuildVoiceState;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 import ru.niron3206.audioplayer.MusicManager;
@@ -14,11 +16,34 @@ import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+@SuppressWarnings("ConstantConditions")
 public class QueueCommand implements ICommand {
 
     @Override
     public void handle(CommandContext ctx) {
         TextChannel channel = ctx.getEvent().getGuildChannel().asTextChannel();
+
+        Member self = ctx.getGuild().getSelfMember();
+        GuildVoiceState selfVoiceState = self.getVoiceState();
+
+        if (!selfVoiceState.inAudioChannel()) {
+            channel.sendMessage("\uD83D\uDD34 Я должен находиться в голосовом канале!").queue();
+            return;
+        }
+
+        Member member = ctx.getEvent().getMember();
+        GuildVoiceState memberVoiceState = member.getVoiceState();
+
+        if(!memberVoiceState.inAudioChannel()) {
+            channel.sendMessage("\uD83D\uDD34 Ты должен зайти в голосовой канал!").queue();
+            return;
+        }
+
+        if(!memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
+            channel.sendMessage("\uD83D\uDD34 Мы должны быть в одном и том же канале!").queue();
+            return;
+        }
+
         MusicManager musicManager = PlayerManager.getInstance().getMusicManager(ctx.getGuild());
         BlockingQueue<AudioTrack> queue = musicManager.scheduler.queue;
 
@@ -29,17 +54,17 @@ public class QueueCommand implements ICommand {
 
         int trackCount = Math.min(queue.size(), 20);
         List<AudioTrack> trackList = new ArrayList<>(queue);
-        MessageCreateAction messageAction = channel.sendMessage("**Очередь:**\n");
+        MessageCreateAction messageAction = channel.sendMessage("\uD83D\uDCC3 **Следующие треки:**");
 
         for (int i = 0; i < trackCount; i++) {
             AudioTrack track = trackList.get(i);
             AudioTrackInfo info = track.getInfo();
 
-            messageAction.addContent("#")
+            messageAction.addContent("\n#")
                     .addContent(String.valueOf(i + 1))
                     .addContent(" `")
-                    .addContent(String.valueOf(info.title))
-                    .addContent("`\nАвтор: `")
+                    .addContent(info.title + "`\n(Ссылка: " + info.uri + ")")
+                    .addContent("\nАвтор: `")
                     .addContent(info.author)
                     .addContent("` [`")
                     .addContent(formatTime(track.getDuration()))
