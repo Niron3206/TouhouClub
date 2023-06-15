@@ -23,8 +23,9 @@ public class AutoLeave {
                 GuildVoiceState selfVoiceState = guild.getSelfMember().getVoiceState();
                 System.out.println("I'm in voice chat (ID: " + selfVoiceState.getChannel().getId() + ")");
 
-                if (musicManager.audioPlayer.getPlayingTrack() == null
-                        && musicManager.scheduler.queue.isEmpty()) {
+                if ((musicManager.audioPlayer.getPlayingTrack() == null
+                        && musicManager.scheduler.queue.isEmpty())
+                        || selfVoiceState.getChannel().asVoiceChannel().getMembers().isEmpty()) {
                     musicManager.scheduler.looping = false;
                     musicManager.audioPlayer.stopTrack();
                     guild.getAudioManager().closeAudioConnection();
