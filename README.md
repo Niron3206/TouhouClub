@@ -13,4 +13,4 @@ To compile this maven project into jar file, write it in console (don't forget t
 
 You will see compiled jar file in target folder, you also need to copy your .env file with your parameters in target folder.
 
-To open jar file you have to write `java -jar TouhouClub-1.0.jar` in console (you have to be in the same directory as the jar file).
+To open jar file you have to write `java -jar TouhouClub-1.4.1.jar` in console (you have to be in the same directory as the jar file).
