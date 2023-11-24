@@ -1,7 +1,6 @@
 package ru.niron3206.cmds;
 
 import net.dv8tion.jda.api.EmbedBuilder;
-import ru.niron3206.Config;
 
 import java.awt.*;
 import java.util.List;
@@ -25,11 +24,30 @@ public class HelpCommand implements ICommand{
             StringBuilder builder = new StringBuilder();
             embed.setTitle("Список команд:\n");
 
-            manager.getCommands().stream().map(ICommand::getName).forEach(
-                    (name) -> {
-                        if(name.equals("hug")) builder.append("**ВЗАИМОДЕЙСТВИЯ:**\n");
-                        if(name.equals("play")) builder.append("**МУЗЫКА:**\n");
-                        builder.append("`").append(Config.get("PREFIX")).append(name).append("`\n");
+            List<ICommand> commands = manager.getCommands();
+
+            commands.forEach(
+                    (cmd) -> {
+
+                        if (cmd.getGroup() == Groups.HELP) {
+                            if(builder.indexOf("ПОМОЩЬ") == -1) {builder.append("**ПОМОЩЬ**\n");}
+                            builder.append("`").append(cmd.getName()).append("`\n");
+                        }
+
+                        if (cmd.getGroup() == Groups.INTERACTION) {
+                            if(builder.indexOf("ВЗАИМОДЕЙСТВИЯ") == -1) {builder.append("**ВЗАИМОДЕЙСТВИЯ**\n");}
+                            builder.append("`").append(cmd.getName()).append("`\n");
+                        }
+
+                        if (cmd.getGroup() == Groups.MUSIC) {
+                            if(builder.indexOf("МУЗЫКА") == -1) {builder.append("**МУЗЫКА**\n");}
+                            builder.append("`").append(cmd.getName()).append("`\n");
+                        }
+
+                        if (cmd.getGroup() == Groups.CONVERSION) {
+                            if(builder.indexOf("КОНВЕРТАЦИЯ") == -1) {builder.append("**КОНВЕРТАЦИЯ**\n");}
+                            builder.append("`").append(cmd.getName()).append("`\n");
+                        }
                     }
             );
 
@@ -66,5 +84,10 @@ public class HelpCommand implements ICommand{
     @Override
     public String getHelp() {
         return "Показывает список доступных команд бота.";
+    }
+
+    @Override
+    public Groups getGroup() {
+        return Groups.HELP;
     }
 }

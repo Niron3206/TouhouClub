@@ -1,9 +1,10 @@
-package ru.niron3206.cmds.Interactions;
+package ru.niron3206.cmds.interactions;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import ru.niron3206.cmds.CommandContext;
+import ru.niron3206.cmds.Groups;
 import ru.niron3206.cmds.ICommand;
 
 import java.awt.Color;
@@ -40,6 +41,11 @@ public class Hug implements ICommand {
     @Override
     public String getHelp() {
         return "Обнимашки всегда выглядят мило! Если вы хотите кого-то обнять, то используйте эту команду.";
+    }
+
+    @Override
+    public Groups getGroup() {
+        return Groups.INTERACTION;
     }
 
     @Override

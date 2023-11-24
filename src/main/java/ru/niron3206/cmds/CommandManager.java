@@ -2,7 +2,7 @@ package ru.niron3206.cmds;
 
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import ru.niron3206.Config;
-import ru.niron3206.cmds.Interactions.*;
+import ru.niron3206.cmds.interactions.*;
 import ru.niron3206.cmds.music.*;
 
 import java.util.ArrayList;
@@ -16,11 +16,10 @@ public class CommandManager {
     public CommandManager() {
         addCommand(new HelpCommand(this));
 
+        //interactions
         addCommand(new Hug());
         addCommand(new Pat());
         addCommand(new Slap());
-
-        //addCommand(new OwOCommand());
 
         //music
         addCommand(new PlayCommand());

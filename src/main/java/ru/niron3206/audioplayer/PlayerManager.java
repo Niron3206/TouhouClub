@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class PlayerManager {
     private static PlayerManager INSTANCE;
@@ -37,15 +38,18 @@ public class PlayerManager {
         });
     }
 
-    public void loadAndPlay(TextChannel channel, String trackUrl) {
+    public void loadAndPlay(TextChannel channel, String trackUrl, Optional<String> fileName) {
         final MusicManager musicManager = getMusicManager(channel.getGuild());
         audioPlayerManager.loadItemOrdered(musicManager, trackUrl, new AudioLoadResultHandler() {
             @Override
             public void trackLoaded(AudioTrack audioTrack) {
                 musicManager.scheduler.queue(audioTrack);
+                String title = audioTrack.getInfo().title;
+
+                if (fileName.isPresent()) {title = fileName.get();}
 
                 channel.sendMessage("Добавляю в очередь: `")
-                        .addContent(audioTrack.getInfo().title)
+                        .addContent(title)
                         .addContent("`\nАвтор: `")
                         .addContent(audioTrack.getInfo().author)
                         .addContent("`")

@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import ru.niron3206.audioplayer.MusicManager;
 import ru.niron3206.audioplayer.PlayerManager;
 import ru.niron3206.cmds.CommandContext;
+import ru.niron3206.cmds.Groups;
 import ru.niron3206.cmds.ICommand;
 
 import java.util.ArrayList;
@@ -59,6 +60,11 @@ public class RemoveCommand implements ICommand {
     @Override
     public String getHelp() {
         return "Удаляет выбранный трек из очереди\nКак использовать: `~remove <номерь трека в очереди>`";
+    }
+
+    @Override
+    public Groups getGroup() {
+        return Groups.MUSIC;
     }
 
     @Override

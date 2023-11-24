@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 import ru.niron3206.audioplayer.MusicManager;
 import ru.niron3206.audioplayer.PlayerManager;
 import ru.niron3206.cmds.CommandContext;
+import ru.niron3206.cmds.Groups;
 import ru.niron3206.cmds.ICommand;
 
 import java.util.ArrayList;
@@ -96,6 +97,11 @@ public class QueueCommand implements ICommand {
     @Override
     public String getHelp() {
         return "Показывает предложенные песни";
+    }
+
+    @Override
+    public Groups getGroup() {
+        return Groups.MUSIC;
     }
 
     @Override

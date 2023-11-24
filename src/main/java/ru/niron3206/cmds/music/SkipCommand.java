@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import ru.niron3206.cmds.CommandContext;
+import ru.niron3206.cmds.Groups;
 import ru.niron3206.cmds.ICommand;
 import ru.niron3206.audioplayer.MusicManager;
 import ru.niron3206.audioplayer.PlayerManager;
@@ -59,6 +60,11 @@ public class SkipCommand implements ICommand {
     @Override
     public String getHelp() {
         return "Пропускает играющий трек.";
+    }
+
+    @Override
+    public Groups getGroup() {
+        return Groups.MUSIC;
     }
 
     @Override
