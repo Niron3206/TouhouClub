@@ -38,7 +38,7 @@ public class PlayerManager {
         });
     }
 
-    public void loadAndPlay(TextChannel channel, String trackUrl, Optional<String> fileName) {
+    public void loadAndPlay(TextChannel channel, String trackUrl, String member, Optional<String> fileName) {
         final MusicManager musicManager = getMusicManager(channel.getGuild());
         audioPlayerManager.loadItemOrdered(musicManager, trackUrl, new AudioLoadResultHandler() {
             @Override
@@ -52,6 +52,8 @@ public class PlayerManager {
                         .addContent(title)
                         .addContent("`\nАвтор: `")
                         .addContent(audioTrack.getInfo().author)
+                        .addContent("`\nПоставил: `")
+                        .addContent(member)
                         .addContent("`")
                         .queue();
             }
@@ -65,6 +67,8 @@ public class PlayerManager {
                         .addContent(track.getInfo().title)
                         .addContent("`\nАвтор: `")
                         .addContent(track.getInfo().author)
+                        .addContent("`\nПоставил: `")
+                        .addContent(member)
                         .addContent("`")
                         .queue();
                 /*

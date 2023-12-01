@@ -53,8 +53,12 @@ public class PlayCommand implements ICommand {
         String link = String.join(" ", ctx.getArgs());
 
         if(!attachments.isEmpty()
-                && Arrays.asList("mp3", "aac", "wav", "flac", "ogg").contains(attachments.get(0).getFileExtension())) {
+                && Arrays.asList("mp3", "aac", "wav", "flac", "ogg", "m4a").contains(attachments.get(0).getFileExtension())) {
             link = attachments.get(0).getUrl();
+
+            PlayerManager.getInstance()
+                    .loadAndPlay(channel, link, member.getEffectiveName(), Optional.of(attachments.get(0).getFileName()));
+            return;
         }
 
         if (!isUrl(link)) {
@@ -62,7 +66,7 @@ public class PlayCommand implements ICommand {
         }
 
         PlayerManager.getInstance()
-                .loadAndPlay(channel, link, Optional.of(attachments.get(0).getFileName()));
+                .loadAndPlay(channel, link, member.getEffectiveName(), Optional.empty());
     }
 
     @Override
