@@ -2,6 +2,7 @@ package ru.niron3206.audioplayer;
 
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
+import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -16,16 +17,19 @@ public class AutoLeave {
 
     public void timer() {
         MusicManager musicManager = PlayerManager.getInstance().getMusicManager(guild);
+
         TimerTask timerTask = new TimerTask() {
             @Override
             public void run() {
 
                 GuildVoiceState selfVoiceState = guild.getSelfMember().getVoiceState();
-                System.out.println("I'm in voice chat (ID: " + selfVoiceState.getChannel().getId() + ")");
+                VoiceChannel channel = selfVoiceState.getChannel().asVoiceChannel();
+
+                System.out.println("I'm in voice chat (ID: " + channel.getId() + ")");
 
                 if ((musicManager.audioPlayer.getPlayingTrack() == null
                         && musicManager.scheduler.queue.isEmpty())
-                        || selfVoiceState.getChannel().asVoiceChannel().getMembers().isEmpty()) {
+                        || channel.getMembers().isEmpty()) {
                     musicManager.scheduler.looping = false;
                     musicManager.audioPlayer.stopTrack();
                     guild.getAudioManager().closeAudioConnection();

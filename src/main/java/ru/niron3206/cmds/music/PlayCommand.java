@@ -26,7 +26,7 @@ public class PlayCommand implements ICommand {
         TextChannel channel = ctx.getEvent().getChannel().asTextChannel();
         List<Message.Attachment> attachments = ctx.getEvent().getMessage().getAttachments();
 
-        if (ctx.getArgs() == null && attachments.size() == 0) {
+        if (ctx.getArgs() == null && attachments.isEmpty()) {
             channel.sendMessage("\uD83D\uDD34 Ничего не понял, вот как должно быть: `~play <ютуб ссылка, ссылка на аудио или прикреплённый аудиофайл>`").queue();
             return;
         }
