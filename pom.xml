@@ -10,8 +10,12 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.release>25</maven.compiler.release>
+
+        <jda.version>6.5.0</jda.version>
+        <jdave.version>0.1.8</jdave.version>
+        <lavaplayer.version>2.2.7</lavaplayer.version>
+        <youtube-source.version>1.18.2</youtube-source.version>
     </properties>
 
     <repositories>
@@ -33,22 +37,36 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.github.DV8FromTheWorld</groupId>
+            <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>v5.0.0-beta.23</version>
+            <version>${jda.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>club.minnced</groupId>
+            <artifactId>jdave-native-linux-x86-64</artifactId>
+            <version>${jdave.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>club.minnced</groupId>
+            <artifactId>jdave-native-linux-aarch64</artifactId>
+            <version>${jdave.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>club.minnced</groupId>
+            <artifactId>jdave-native-win-x86-64</artifactId>
+            <version>${jdave.version}</version>
         </dependency>
 
         <dependency>
             <groupId>dev.arbjerg</groupId>
             <artifactId>lavaplayer</artifactId>
-            <version>2.2.1</version>
+            <version>${lavaplayer.version}</version>
         </dependency>
         <dependency>
             <groupId>dev.lavalink.youtube</groupId>
             <artifactId>v2</artifactId>
-            <version>1.5.1</version>
+            <version>${youtube-source.version}</version>
         </dependency>
-
 
         <dependency>
             <groupId>io.github.cdimascio</groupId>
@@ -56,47 +74,55 @@
             <version>2.3.1</version>
         </dependency>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>2.0.7</version>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.6.3</version>
         </dependency>
     </dependencies>
 
     <build>
+        <finalName>TouhouClub</finalName>
+
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.10.1</version>
+                <version>3.14.1</version>
             </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.2.2</version>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <addClasspath>true</addClasspath>
-                            <mainClass>ru.niron3206.Main</mainClass>
-                            <classpathPrefix>dependency-jars/</classpathPrefix>
-                        </manifest>
-                    </archive>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.6.0</version>
                 <executions>
                     <execution>
-                        <id>copy-dependencies</id>
                         <phase>package</phase>
                         <goals>
-                            <goal>copy-dependencies</goal>
+                            <goal>shade</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/dependency-jars/</outputDirectory>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <transformers>
+                                <!-- lavaplayer и logback ищут реализации через META-INF/services -->
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <manifestEntries>
+                                        <Main-Class>ru.niron3206.Main</Main-Class>
+                                        <Enable-Native-Access>ALL-UNNAMED</Enable-Native-Access>
+                                    </manifestEntries>
+                                </transformer>
+                            </transformers>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                        <exclude>module-info.class</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
                         </configuration>
                     </execution>
                 </executions>

@@ -25,7 +25,20 @@ public class PlayerManager {
         this.musicManager = new HashMap<>();
         this.audioPlayerManager = new DefaultAudioPlayerManager();
 
-        YoutubeAudioSourceManager youtube = new YoutubeAudioSourceManager();
+        // youtube support
+        YoutubeAudioSourceManager youtube = new YoutubeAudioSourceManager(true
+//                , new Client[] {
+//                new Music(),
+//               new Web(),
+//               new WebEmbedded(),
+//                new Android(),
+//                new AndroidMusic(),
+//                new AndroidVr(),
+//               new Ios(),
+//                new TvHtml5Embedded()
+//        }
+        );
+
         audioPlayerManager.registerSourceManager(youtube);
 
         AudioSourceManagers.registerRemoteSources(audioPlayerManager);

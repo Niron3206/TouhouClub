@@ -4,9 +4,26 @@ import io.github.cdimascio.dotenv.Dotenv;
 
 public class Config {
 
-    private static final Dotenv dotenv = Dotenv.load();
+    // ignoreIfMissing
+    private static final Dotenv DOTENV = Dotenv.configure()
+            .ignoreIfMissing()
+            .ignoreIfMalformed()
+            .load();
+
+    private Config() {}
 
     public static String get(String key) {
-        return dotenv.get(key.toUpperCase());
+        return DOTENV.get(key.toUpperCase());
+    }
+
+    public static String require(String key) {
+        String value = get(key);
+
+        if (value == null || value.isBlank()) {
+            throw new IllegalStateException(
+                    "Не задана настройка " + key.toUpperCase() + ". "
+                            + "Укажите её в файле .env (см. .env-example) или в переменных окружения.");
+        }
+        return value;
     }
 }

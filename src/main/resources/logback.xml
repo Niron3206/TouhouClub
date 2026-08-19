@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %-5level %-32logger{32} %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="STDOUT"/>
+    </root>
+
+    <logger name="ru.niron3206" level="DEBUG"/>
+
+    <!-- шумят на каждом событии гейтвея -->
+    <logger name="net.dv8tion.jda.internal.requests.WebSocketClient" level="WARN"/>
+    <logger name="net.dv8tion.jda.api.audio" level="INFO"/>
+
+</configuration>

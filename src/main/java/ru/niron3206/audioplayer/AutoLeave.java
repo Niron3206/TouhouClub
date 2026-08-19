@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 
+import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -23,7 +24,8 @@ public class AutoLeave {
             public void run() {
 
                 GuildVoiceState selfVoiceState = guild.getSelfMember().getVoiceState();
-                VoiceChannel channel = selfVoiceState.getChannel().asVoiceChannel();
+                VoiceChannel channel = Objects.requireNonNull(selfVoiceState.getChannel()).asVoiceChannel();
+
 
                 System.out.println("I'm in voice chat (ID: " + channel.getId() + ")");
 

@@ -3,15 +3,28 @@
 
 This is local Java project for discord bot, based on JDA library.
 
+**Requires Java 25.** Voice support relies on the DAVE protocol
+([JDAVE](https://github.com/MinnDevelopment/jdave)), which uses the FFM API and does not
+work on older JDKs. Discord blocks voice connections without DAVE.
+
 You also have to specify token and prefix in `.env` file, which must be created in the root of the project.
 The easiest way to do it is to copy the `.env-example` and rename it to `.env`.
+Alternatively, both can be passed as environment variables. Useful for containers.
 
-You can also build your own maven-jar-application and run it via command console.\
-To compile this maven project into jar file, write it in console (don't forget to install maven if you haven't downloaded it yet):
+## Building
 
-`1. mvn compile`\
-`2. mvn package`
+Don't forget to install maven if you haven't downloaded it yet:
 
-You will see compiled jar file in target folder, you also need to copy your .env file with your parameters in target folder.
+`mvn package`
 
-To open jar file you have to write `java -jar TouhouClub-1.6.jar` in console (you have to be in the same directory as the jar file).
+This produces a single self-contained `target/TouhouClub.jar` with all dependencies inside.
+
+Run it with `java -jar TouhouClub.jar`. Put your `.env` next to the jar, or pass
+`TOKEN` and `PREFIX` through the environment.
+
+## Docker
+
+`docker build -t touhouclub .`\
+`docker run --rm --env-file .env touhouclub`
+
+The image builds the project itself, so a local JDK is not required.
