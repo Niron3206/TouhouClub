@@ -15,7 +15,10 @@
         <jda.version>6.5.0</jda.version>
         <jdave.version>0.1.8</jdave.version>
         <lavaplayer.version>2.2.7</lavaplayer.version>
-        <youtube-source.version>1.18.2</youtube-source.version>
+        <!--
+            починено в PR #233, в релиз ещё не вошло. версия прибита к коммиту
+        -->
+        <youtube-source.version>f45bbb7aebfcbc1c553769e04af6cd43afa8b7c3-SNAPSHOT</youtube-source.version>
     </properties>
 
     <repositories>
@@ -32,6 +35,14 @@
             <id>arbjergDev-releases</id>
             <name>Lavalink Repository</name>
             <url>https://maven.lavalink.dev/releases</url>
+        </repository>
+        <repository>
+            <id>lavalink-snapshots</id>
+            <name>Lavalink Snapshots</name>
+            <url>https://maven.lavalink.dev/snapshots</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
         </repository>
     </repositories>
 

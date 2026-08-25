@@ -1,63 +1,70 @@
 package ru.niron3206.cmds.music;
 
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
+import net.dv8tion.jda.api.entities.channel.unions.AudioChannelUnion;
 import net.dv8tion.jda.api.managers.AudioManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.niron3206.audioplayer.AutoLeave;
+import ru.niron3206.audioplayer.PlayerManager;
 import ru.niron3206.cmds.CommandContext;
 import ru.niron3206.cmds.Groups;
 import ru.niron3206.cmds.ICommand;
-import ru.niron3206.audioplayer.PlayerManager;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
+import java.util.Locale;
+import java.util.Set;
 
-@SuppressWarnings("ConstantConditions")
 public class PlayCommand implements ICommand {
+
+    private static final Logger LOG = LoggerFactory.getLogger(PlayCommand.class);
+
+    private static final Set<String> AUDIO_EXTENSIONS = Set.of("mp3", "aac", "wav", "flac", "ogg", "m4a");
 
     @Override
     public void handle(CommandContext ctx) {
-        TextChannel channel = ctx.getEvent().getChannel().asTextChannel();
+        GuildMessageChannel channel = ctx.getEvent().getGuildChannel();
         List<Message.Attachment> attachments = ctx.getEvent().getMessage().getAttachments();
 
-        if (ctx.getArgs() == null && attachments.isEmpty()) {
-            channel.sendMessage("\uD83D\uDD34 Ничего не понял, вот как должно быть: `~play <ютуб ссылка, ссылка на аудио или прикреплённый аудиофайл>`").queue();
+        if (ctx.getArgs().isEmpty() && attachments.isEmpty()) {
+            channel.sendMessage("🔴 Ничего не понял, вот как должно быть: `~play <ютуб ссылка, ссылка на аудио или прикреплённый аудиофайл>`").queue();
             return;
         }
 
         Member member = ctx.getEvent().getMember();
-        GuildVoiceState memberVoiceState = member.getVoiceState();
+        GuildVoiceState memberVoiceState = member == null ? null : member.getVoiceState();
 
-        if(!memberVoiceState.inAudioChannel()) {
-            channel.sendMessage("\uD83D\uDD34 Ты должен зайти в голосовой канал!").queue();
+        if (memberVoiceState == null || !memberVoiceState.inAudioChannel()) {
+            channel.sendMessage("🔴 Ты должен зайти в голосовой канал!").queue();
             return;
         }
 
-        Member self = ctx.getGuild().getSelfMember();
-        GuildVoiceState selfVoiceState = self.getVoiceState();
+        AudioManager audioManager = ctx.getGuild().getAudioManager();
 
-        if (!selfVoiceState.inAudioChannel()) {
-            VoiceChannel memberChannel = memberVoiceState.getChannel().asVoiceChannel();
-            AudioManager audioManager = ctx.getGuild().getAudioManager();
-            channel.sendMessageFormat("\uD83D\uDD0C Подключаюсь к `\uD83D\uDD0A %s`", memberChannel.getName()).queue();
-            audioManager.openAudioConnection(memberChannel);
-            new AutoLeave(ctx.getGuild()).timer();
+        if (!audioManager.isConnected()) {
+            if (!connect(ctx, channel, memberVoiceState.getChannel())) {
+                return;
+            }
+        }
+
+        String fileName = audioAttachmentName(attachments);
+
+        if (fileName != null) {
+            PlayerManager.getInstance()
+                    .loadAndPlay(channel, attachments.get(0).getUrl(), member.getEffectiveName(), fileName);
+            return;
         }
 
         String link = String.join(" ", ctx.getArgs());
 
-        if(!attachments.isEmpty()
-                && Arrays.asList("mp3", "aac", "wav", "flac", "ogg", "m4a").contains(attachments.get(0).getFileExtension())) {
-            link = attachments.get(0).getUrl();
-
-            PlayerManager.getInstance()
-                    .loadAndPlay(channel, link, member.getEffectiveName(), Optional.of(attachments.get(0).getFileName()));
+        if (link.isBlank()) {
+            channel.sendMessage("🔴 Этот файл не похож на аудио, а ссылки ты не дал!").queue();
             return;
         }
 
@@ -65,17 +72,60 @@ public class PlayCommand implements ICommand {
             link = "ytsearch:" + link;
         }
 
-        PlayerManager.getInstance()
-                .loadAndPlay(channel, link, member.getEffectiveName(), Optional.empty());
+        PlayerManager.getInstance().loadAndPlay(channel, link, member.getEffectiveName(), null);
+    }
+
+    private boolean connect(CommandContext ctx, GuildMessageChannel channel, AudioChannelUnion target) {
+        Member self = ctx.getGuild().getSelfMember();
+
+        if (!self.hasPermission(target, Permission.VOICE_CONNECT, Permission.VOICE_SPEAK)) {
+            channel.sendMessageFormat("🔴 У меня нет прав, чтобы зайти в `%s`", target.getName()).queue();
+            return false;
+        }
+
+        AudioManager audioManager = ctx.getGuild().getAudioManager();
+
+        audioManager.setSendingHandler(PlayerManager.getInstance().getMusicManager(ctx.getGuild()).getHandler());
+
+        channel.sendMessageFormat("🔌 Подключаюсь к `🔊 %s`", target.getName()).queue();
+        audioManager.openAudioConnection(target);
+        AutoLeave.watch(ctx.getGuild());
+
+        LOG.debug("Подключение к {}: статус {}", target.getId(), audioManager.getConnectionStatus());
+
+        return true;
+    }
+
+    private String audioAttachmentName(List<Message.Attachment> attachments) {
+        if (attachments.isEmpty()) {
+            return null;
+        }
+
+        String extension = attachments.get(0).getFileExtension();
+
+        if (extension == null || !AUDIO_EXTENSIONS.contains(extension.toLowerCase(Locale.ROOT))) {
+            return null;
+        }
+
+        return attachments.get(0).getFileName();
+    }
+
+    private boolean isUrl(String value) {
+        try {
+            String scheme = new URI(value).getScheme();
+            return "http".equalsIgnoreCase(scheme) || "https".equalsIgnoreCase(scheme);
+        } catch (URISyntaxException e) {
+            return false;
+        }
     }
 
     @Override
-    public String getName () {
+    public String getName() {
         return "play";
     }
 
     @Override
-    public String getHelp () {
+    public String getHelp() {
         return "Играет песенки, которые вы поставите\n" +
                 "Как использовать: `~play <ютуб ссылка, ссылка на аудио или прикреплённый аудиофайл>`";
     }
@@ -86,16 +136,7 @@ public class PlayCommand implements ICommand {
     }
 
     @Override
-    public List<String> getAliases () {
+    public List<String> getAliases() {
         return List.of("p", "P");
-    }
-
-    private boolean isUrl (String url){
-        try {
-            new URI(url);
-            return true;
-        } catch (URISyntaxException e) {
-            return false;
-        }
     }
 }

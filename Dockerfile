@@ -9,4 +9,5 @@ RUN mvn -B package
 FROM eclipse-temurin:25-jre
 WORKDIR /app
 COPY --from=build /build/target/TouhouClub.jar .
-CMD ["java", "-jar", "TouhouClub.jar"]
+# не кэшировать неудачный резолв
+CMD ["java", "-Dnetworkaddress.cache.negative.ttl=0", "-jar", "TouhouClub.jar"]

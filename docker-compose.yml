@@ -1,0 +1,25 @@
+services:
+  yt-cipher:
+    image: ghcr.io/kikkia/yt-cipher:master
+    container_name: touhouclub-cipher
+    environment:
+      - OVERRIDE_PLAYER_VARIANT=IAS
+    # ходит к ютубу сам, поэтому резолверы нужны ему не меньше, чем боту
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
+    restart: unless-stopped
+
+  bot:
+    build: .
+    container_name: touhouclub
+    env_file: .env
+    environment:
+      - YT_CIPHER_URL=http://yt-cipher:8001
+    depends_on:
+      - yt-cipher
+    # свои резолверы, т.к. на резолвере хоста ютуб отваливался пачками
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
+    restart: unless-stopped

@@ -24,7 +24,23 @@ Run it with `java -jar TouhouClub.jar`. Put your `.env` next to the jar, or pass
 
 ## Docker
 
-`docker build -t touhouclub .`\
-`docker run --rm --env-file .env touhouclub`
+`docker compose up -d --build`
 
+This starts the bot together with the cipher server it needs for YouTube,
+wiring them on a shared network. Put your `.env` next to `docker-compose.yml`.
 The image builds the project itself, so a local JDK is not required.
+
+## YouTube playback
+
+YouTube does not serve audio to anonymous requests, you will see
+`Sign in to confirm you're not a bot` or `This video requires login`.
+Two settings are needed, and they only work together:
+
+- `YT_CIPHER_URL` a [yt-cipher](https://github.com/kikkia/yt-cipher) server.
+  `docker compose` starts one for you; it supplies the `signatureTimestamp`
+  that the bundled player-script parser cannot extract.
+- `YT_OAUTH_REFRESH_TOKEN` gets past the login wall via the TV client, the only
+  one supporting OAuth. Set `YT_OAUTH=true` once and the log prints a link, a code
+  and then the refresh token. **Use a burner Google account**, not your main one.
+
+See `.env-example` for details.

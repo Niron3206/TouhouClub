@@ -22,7 +22,7 @@ public class Listener extends ListenerAdapter {
     public void onMessageReceived(MessageReceivedEvent event) {
         User user = event.getAuthor();
 
-        if(user.isBot() || event.isWebhookMessage()) return;
+        if(user.isBot() || event.isWebhookMessage() || !event.isFromGuild()) return;
 
         String prefix = Config.get("PREFIX");
         String raw = event.getMessage().getContentRaw();

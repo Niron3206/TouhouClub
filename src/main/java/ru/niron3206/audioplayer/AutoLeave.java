@@ -2,46 +2,100 @@ package ru.niron3206.audioplayer;
 
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
-import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
+import net.dv8tion.jda.api.entities.channel.unions.AudioChannelUnion;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.Objects;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+
 
 public class AutoLeave {
 
-    private final Guild guild;
+    private static final Logger LOG = LoggerFactory.getLogger(AutoLeave.class);
 
-    public AutoLeave(Guild guild) {
-        this.guild = guild;
+    private static final ScheduledExecutorService SCHEDULER =
+            Executors.newSingleThreadScheduledExecutor(task -> {
+                Thread thread = new Thread(task, "AutoLeave");
+                thread.setDaemon(true);
+                return thread;
+            });
+
+    private static final Map<Long, ScheduledFuture<?>> WATCHERS = new ConcurrentHashMap<>();
+    private static final Map<Long, Integer> IDLE_CHECKS = new ConcurrentHashMap<>();
+
+    private AutoLeave() {}
+
+    public static void watch(Guild guild) {
+        long guildId = guild.getIdLong();
+
+        WATCHERS.computeIfAbsent(guildId, id -> SCHEDULER.scheduleWithFixedDelay(
+                () -> check(guild), 60, 60, TimeUnit.SECONDS));
     }
 
-    public void timer() {
-        MusicManager musicManager = PlayerManager.getInstance().getMusicManager(guild);
+    public static void cancel(Guild guild) {
+        IDLE_CHECKS.remove(guild.getIdLong());
+        ScheduledFuture<?> watcher = WATCHERS.remove(guild.getIdLong());
 
-        TimerTask timerTask = new TimerTask() {
-            @Override
-            public void run() {
+        if (watcher != null) {
+            watcher.cancel(false);
+        }
+    }
 
-                GuildVoiceState selfVoiceState = guild.getSelfMember().getVoiceState();
-                VoiceChannel channel = Objects.requireNonNull(selfVoiceState.getChannel()).asVoiceChannel();
+    private static void check(Guild guild) {
+        // исключение отсюда навсегда отменило бы периодическую задачу
+        try {
+            GuildVoiceState selfVoiceState = guild.getSelfMember().getVoiceState();
+            AudioChannelUnion channel = selfVoiceState == null ? null : selfVoiceState.getChannel();
 
-
-                System.out.println("I'm in voice chat (ID: " + channel.getId() + ")");
-
-                if ((musicManager.audioPlayer.getPlayingTrack() == null
-                        && musicManager.scheduler.queue.isEmpty())
-                        || channel.getMembers().isEmpty()) {
-                    musicManager.scheduler.looping = false;
-                    musicManager.audioPlayer.stopTrack();
-                    guild.getAudioManager().closeAudioConnection();
-                    cancel();
-                }
+            if (channel == null) {
+                cancel(guild);
+                return;
             }
-        };
 
-        Timer timer = new Timer("BotInVoice");
+            MusicManager musicManager = PlayerManager.getInstance().getMusicManager(guild);
 
-        timer.scheduleAtFixedRate(timerTask, 5000, 60000);
+            boolean nothingToPlay = musicManager.audioPlayer.getPlayingTrack() == null
+                    && musicManager.scheduler.queue.isEmpty();
+            // сам бот тоже числится участником канала, поэтому считаем только людей
+            boolean noListeners = channel.getMembers().stream()
+                    .noneMatch(member -> !member.getUser().isBot());
+
+            if (noListeners) {
+                LOG.debug("Выхожу из канала {}: слушателей не осталось", channel.getId());
+                leave(guild, musicManager);
+                return;
+            }
+
+            if (!nothingToPlay) {
+                IDLE_CHECKS.remove(guild.getIdLong());
+                return;
+            }
+
+            int idleChecks = IDLE_CHECKS.merge(guild.getIdLong(), 1, Integer::sum);
+
+            if (idleChecks < 2) {
+                LOG.debug("Канал {} простаивает, жду ещё одну проверку", channel.getId());
+                return;
+            }
+
+            LOG.debug("Выхожу из канала {}: играть нечего", channel.getId());
+            leave(guild, musicManager);
+        } catch (Exception e) {
+            LOG.error("Проверка голосового канала сервера {} сорвалась", guild.getId(), e);
+        }
+    }
+
+    private static void leave(Guild guild, MusicManager musicManager) {
+        musicManager.scheduler.looping = false;
+        musicManager.scheduler.queue.clear();
+        musicManager.audioPlayer.stopTrack();
+        guild.getAudioManager().closeAudioConnection();
+
+        cancel(guild);
     }
 }
