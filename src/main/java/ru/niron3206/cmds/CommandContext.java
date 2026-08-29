@@ -1,6 +1,8 @@
 package ru.niron3206.cmds;
 
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.List;
@@ -16,6 +18,13 @@ public class CommandContext {
 
     public Guild getGuild() {
         return getEvent().getGuild();
+    }
+    public GuildMessageChannel getChannel() {
+        return event.getGuildChannel();
+    }
+
+    public Member getMember() {
+        return event.getMember();
     }
 
     public MessageReceivedEvent getEvent() {

@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.entities.channel.unions.AudioChannelUnion;
 import net.dv8tion.jda.api.managers.AudioManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.niron3206.Config;
 import ru.niron3206.audioplayer.AutoLeave;
 import ru.niron3206.audioplayer.PlayerManager;
 import ru.niron3206.cmds.CommandContext;
@@ -21,6 +22,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
+// отдельный случай от MusicCommand
 public class PlayCommand implements ICommand {
 
     private static final Logger LOG = LoggerFactory.getLogger(PlayCommand.class);
@@ -29,15 +31,15 @@ public class PlayCommand implements ICommand {
 
     @Override
     public void handle(CommandContext ctx) {
-        GuildMessageChannel channel = ctx.getEvent().getGuildChannel();
+        GuildMessageChannel channel = ctx.getChannel();
         List<Message.Attachment> attachments = ctx.getEvent().getMessage().getAttachments();
 
         if (ctx.getArgs().isEmpty() && attachments.isEmpty()) {
-            channel.sendMessage("🔴 Ничего не понял, вот как должно быть: `~play <ютуб ссылка, ссылка на аудио или прикреплённый аудиофайл>`").queue();
+            channel.sendMessage("🔴 Ничего не понял, вот как должно быть: `" + usage() + "`").queue();
             return;
         }
 
-        Member member = ctx.getEvent().getMember();
+        Member member = ctx.getMember();
         GuildVoiceState memberVoiceState = member == null ? null : member.getVoiceState();
 
         if (memberVoiceState == null || !memberVoiceState.inAudioChannel()) {
@@ -126,8 +128,11 @@ public class PlayCommand implements ICommand {
 
     @Override
     public String getHelp() {
-        return "Играет песенки, которые вы поставите\n" +
-                "Как использовать: `~play <ютуб ссылка, ссылка на аудио или прикреплённый аудиофайл>`";
+        return "Играет песенки, которые вы поставите\nКак использовать: `" + usage() + "`";
+    }
+
+    private static String usage() {
+        return Config.prefix() + "play <ютуб ссылка, ссылка на аудио или прикреплённый аудиофайл>";
     }
 
     @Override
@@ -137,6 +142,6 @@ public class PlayCommand implements ICommand {
 
     @Override
     public List<String> getAliases() {
-        return List.of("p", "P");
+        return List.of("p");
     }
 }

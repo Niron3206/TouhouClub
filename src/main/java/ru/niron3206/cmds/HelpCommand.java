@@ -1,10 +1,13 @@
 package ru.niron3206.cmds;
 
 import net.dv8tion.jda.api.EmbedBuilder;
+import ru.niron3206.Config;
+import ru.niron3206.util.Colors;
 
-import java.awt.*;
+import java.util.EnumMap;
 import java.util.List;
-import java.util.Random;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class HelpCommand implements ICommand{
 
@@ -17,63 +20,47 @@ public class HelpCommand implements ICommand{
     @Override
     public void handle(CommandContext ctx) {
         EmbedBuilder embed = new EmbedBuilder();
-        Random random = new Random();
         List<String> args = ctx.getArgs();
 
-        if(args.size() == 0) {
-            StringBuilder builder = new StringBuilder();
-            embed.setTitle("Список команд:\n");
-
-            List<ICommand> commands = manager.getCommands();
-
-            commands.forEach(
-                    (cmd) -> {
-
-                        if (cmd.getGroup() == Groups.HELP) {
-                            if(builder.indexOf("ПОМОЩЬ") == -1) {builder.append("**ПОМОЩЬ**\n");}
-                            builder.append("`").append(cmd.getName()).append("`\n");
-                        }
-
-                        if (cmd.getGroup() == Groups.INTERACTION) {
-                            if(builder.indexOf("ВЗАИМОДЕЙСТВИЯ") == -1) {builder.append("**ВЗАИМОДЕЙСТВИЯ**\n");}
-                            builder.append("`").append(cmd.getName()).append("`\n");
-                        }
-
-                        if (cmd.getGroup() == Groups.MUSIC) {
-                            if(builder.indexOf("МУЗЫКА") == -1) {builder.append("**МУЗЫКА**\n");}
-                            builder.append("`").append(cmd.getName()).append("`\n");
-                        }
-
-                        if (cmd.getGroup() == Groups.CONVERSION) {
-                            if(builder.indexOf("КОНВЕРТАЦИЯ") == -1) {builder.append("**КОНВЕРТАЦИЯ**\n");}
-                            builder.append("`").append(cmd.getName()).append("`\n");
-                        }
-                    }
-            );
-
-            embed.setDescription(builder.toString());
-            embed.setFooter("*если вы хотите узнать, что делает та или иная команда, то введите ~help <команда из списка>");
-            embed.setColor(new Color(random.nextInt(255), random.nextInt(255), random.nextInt(255)).getRGB());
-            ctx.getEvent().getChannel().sendMessageEmbeds(embed.build()).queue();
-            embed.clear();
+        if (args.isEmpty()) {
+            embed.setTitle("Список команд:");
+            embed.setDescription(commandList());
+            embed.setFooter("*если вы хотите узнать, что делает та или иная команда, то введите "
+                    + Config.prefix() + "help <команда из списка>");
+            embed.setColor(Colors.random());
+            ctx.getChannel().sendMessageEmbeds(embed.build()).queue();
             return;
         }
 
         String search = args.get(0);
         ICommand command = manager.getCommand(search);
 
-        if(command == null) {
+        if (command == null) {
             embed.setTitle(":red_circle: Команды `" + search + "` не существует!");
             embed.setColor(0xd60012);
-            ctx.getEvent().getChannel().sendMessageEmbeds(embed.build()).queue();
-            embed.clear();
-            return;
+        } else {
+            embed.setTitle(command.getHelp());
+            embed.setColor(Colors.random());
         }
 
-        embed.setTitle(command.getHelp());
-        embed.setColor(new Color(random.nextInt(255), random.nextInt(255), random.nextInt(255)).getRGB());
-        ctx.getEvent().getChannel().sendMessageEmbeds(embed.build()).queue();
-        embed.clear();
+        ctx.getChannel().sendMessageEmbeds(embed.build()).queue();
+    }
+
+    private String commandList() {
+        // держит разделы в порядке объявления groups
+        Map<Groups, List<ICommand>> byGroup = manager.getCommands().stream()
+                .collect(Collectors.groupingBy(ICommand::getGroup,
+                        () -> new EnumMap<>(Groups.class),
+                        Collectors.toList()));
+
+        StringBuilder builder = new StringBuilder();
+
+        byGroup.forEach((group, commands) -> {
+            builder.append("**").append(group.getTitle()).append("**\n");
+            commands.forEach(cmd -> builder.append("`").append(cmd.getName()).append("`\n"));
+        });
+
+        return builder.toString();
     }
 
     @Override

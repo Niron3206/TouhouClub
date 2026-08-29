@@ -1,55 +1,52 @@
 package ru.niron3206.cmds.music;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import net.dv8tion.jda.api.entities.GuildVoiceState;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
+import ru.niron3206.Config;
 import ru.niron3206.audioplayer.MusicManager;
-import ru.niron3206.audioplayer.PlayerManager;
 import ru.niron3206.cmds.CommandContext;
-import ru.niron3206.cmds.Groups;
-import ru.niron3206.cmds.ICommand;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
 
-@SuppressWarnings("ConstantConditions")
-public class RemoveCommand implements ICommand {
+public class RemoveCommand extends MusicCommand {
+
     @Override
-    public void handle(CommandContext ctx) {
-        TextChannel channel = ctx.getEvent().getGuildChannel().asTextChannel();
-        Member self = ctx.getGuild().getSelfMember();
-        GuildVoiceState selfVoiceState = self.getVoiceState();
+    protected void handleMusic(CommandContext ctx, MusicManager musicManager) {
+        GuildMessageChannel channel = ctx.getChannel();
+        List<String> args = ctx.getArgs();
 
-        if (!selfVoiceState.inAudioChannel()) {
-            channel.sendMessage("\uD83D\uDD34 Я должен находиться в голосовом канале!").queue();
+        if (args.isEmpty()) {
+            channel.sendMessage("🔴 Не понял, какой трек убрать: `" + Config.prefix() + "remove <номер трека в очереди>`").queue();
             return;
         }
 
-        Member member = ctx.getEvent().getMember();
-        GuildVoiceState memberVoiceState = member.getVoiceState();
+        List<AudioTrack> tracks = new ArrayList<>(musicManager.scheduler.queue);
 
-        if(!memberVoiceState.inAudioChannel()) {
-            channel.sendMessage("\uD83D\uDD34 Ты должен зайти в голосовой канал!").queue();
+        if (tracks.isEmpty()) {
+            channel.sendMessage("Очередь пуста").queue();
             return;
         }
 
-        if(!memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
-            channel.sendMessage("\uD83D\uDD34 Мы должны быть в одном и том же канале!").queue();
+        int position;
+
+        try {
+            position = Integer.parseInt(args.get(0));
+        } catch (NumberFormatException e) {
+            channel.sendMessage("🔴 Номер трека должен быть числом, а не `" + args.get(0) + "`!").queue();
             return;
         }
 
-        MusicManager musicManager = PlayerManager.getInstance().getMusicManager(ctx.getGuild());
-        BlockingQueue<AudioTrack> queue = musicManager.scheduler.queue;
-        List<AudioTrack> trackList = new ArrayList<>(queue);
+        if (position < 1 || position > tracks.size()) {
+            channel.sendMessageFormat("🔴 В очереди `%d` треков, номера `%d` там нет!", tracks.size(), position).queue();
+            return;
+        }
 
-        AudioTrack trackToDelete = trackList.get(Integer.parseInt(ctx.getArgs().get(0)) - 1);
+        AudioTrack track = tracks.get(position - 1);
 
-        musicManager.scheduler.queue.remove(trackToDelete);
+        musicManager.scheduler.queue.remove(track);
 
-        channel.sendMessage("\uD83C\uDFB5 Трек `" + trackToDelete.getInfo().title + "` был удалён из очереди!").queue();
-
+        channel.sendMessage("🎵 Трек `" + track.getInfo().title + "` был удалён из очереди!").queue();
     }
 
     @Override
@@ -59,16 +56,11 @@ public class RemoveCommand implements ICommand {
 
     @Override
     public String getHelp() {
-        return "Удаляет выбранный трек из очереди\nКак использовать: `~remove <номерь трека в очереди>`";
-    }
-
-    @Override
-    public Groups getGroup() {
-        return Groups.MUSIC;
+        return "Удаляет выбранный трек из очереди\nКак использовать: `" + Config.prefix() + "remove <номер трека в очереди>`";
     }
 
     @Override
     public List<String> getAliases() {
-        return List.of("r", "R");
+        return List.of("r");
     }
 }

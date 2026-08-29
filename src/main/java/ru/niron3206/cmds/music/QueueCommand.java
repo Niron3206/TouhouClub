@@ -2,91 +2,66 @@ package ru.niron3206.cmds.music;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
-import net.dv8tion.jda.api.entities.GuildVoiceState;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
+import net.dv8tion.jda.api.entities.Message;
 import ru.niron3206.audioplayer.MusicManager;
-import ru.niron3206.audioplayer.PlayerManager;
 import ru.niron3206.cmds.CommandContext;
-import ru.niron3206.cmds.Groups;
-import ru.niron3206.cmds.ICommand;
+import ru.niron3206.util.TimeFormat;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.TimeUnit;
 
-@SuppressWarnings("ConstantConditions")
-public class QueueCommand implements ICommand {
+public class QueueCommand extends MusicCommand {
+
+    private static final int MAX_TRACKS = 20;
+    private static final int MAX_TITLE_LENGTH = 80;
+    // место под хвост N более...
+    private static final int TAIL_RESERVE = 40;
 
     @Override
-    public void handle(CommandContext ctx) {
-        TextChannel channel = ctx.getEvent().getGuildChannel().asTextChannel();
+    protected void handleMusic(CommandContext ctx, MusicManager musicManager) {
+        List<AudioTrack> tracks = new ArrayList<>(musicManager.scheduler.queue);
 
-        Member self = ctx.getGuild().getSelfMember();
-        GuildVoiceState selfVoiceState = self.getVoiceState();
-
-        if (!selfVoiceState.inAudioChannel()) {
-            channel.sendMessage("\uD83D\uDD34 Я должен находиться в голосовом канале!").queue();
+        if (tracks.isEmpty()) {
+            ctx.getChannel().sendMessage("Очередь пуста").queue();
             return;
         }
 
-        Member member = ctx.getEvent().getMember();
-        GuildVoiceState memberVoiceState = member.getVoiceState();
-
-        if(!memberVoiceState.inAudioChannel()) {
-            channel.sendMessage("\uD83D\uDD34 Ты должен зайти в голосовой канал!").queue();
-            return;
-        }
-
-        if(!memberVoiceState.getChannel().equals(selfVoiceState.getChannel())) {
-            channel.sendMessage("\uD83D\uDD34 Мы должны быть в одном и том же канале!").queue();
-            return;
-        }
-
-        MusicManager musicManager = PlayerManager.getInstance().getMusicManager(ctx.getGuild());
-        BlockingQueue<AudioTrack> queue = musicManager.scheduler.queue;
-
-        if (queue.isEmpty()) {
-            channel.sendMessage("Очередь пуста").queue();
-            return;
-        }
-
-        int trackCount = Math.min(queue.size(), 20);
-        List<AudioTrack> trackList = new ArrayList<>(queue);
-        MessageCreateAction messageAction = channel.sendMessage("\uD83D\uDCC3 **Следующие треки:**");
-
-        for (int i = 0; i < trackCount; i++) {
-            AudioTrack track = trackList.get(i);
-            AudioTrackInfo info = track.getInfo();
-
-            messageAction.addContent("\n#")
-                    .addContent(String.valueOf(i + 1))
-                    .addContent(" `")
-                    .addContent(info.title + "`\n(Ссылка: " + info.uri + ")")
-                    .addContent("\nАвтор: `")
-                    .addContent(info.author)
-                    .addContent("` [`")
-                    .addContent(formatTime(track.getDuration()))
-                    .addContent("`]\n");
-        }
-
-        if (trackList.size() > trackCount) {
-            messageAction.addContent("И `")
-                    .addContent(String.valueOf(trackList.size() - trackCount))
-                    .addContent("` более...");
-        }
-
-        messageAction.queue();
+        ctx.getChannel().sendMessage(buildText(tracks)).queue();
     }
 
-    private String formatTime(long timeInMillis) {
-        long hours = timeInMillis / TimeUnit.HOURS.toMillis(1);
-        long minutes = timeInMillis / TimeUnit.MINUTES.toMillis(1);
-        long seconds = timeInMillis % TimeUnit.MINUTES.toMillis(1) / TimeUnit.SECONDS.toMillis(1);
+    static String buildText(List<AudioTrack> tracks) {
+        StringBuilder text = new StringBuilder("📃 **Следующие треки:**\n");
+        int shown = 0;
 
-        return String.format("%02d:%02d:%02d", hours, minutes, seconds);
+        while (shown < tracks.size() && shown < MAX_TRACKS) {
+            String entry = format(shown + 1, tracks.get(shown));
+
+            // 20 треков могут и не влезть
+            if (text.length() + entry.length() + TAIL_RESERVE > Message.MAX_CONTENT_LENGTH) {
+                break;
+            }
+
+            text.append(entry);
+            shown++;
+        }
+
+        if (shown < tracks.size()) {
+            text.append("И `").append(tracks.size() - shown).append("` более...");
+        }
+
+        return text.toString();
+    }
+
+    private static String format(int position, AudioTrack track) {
+        AudioTrackInfo info = track.getInfo();
+
+        return "#" + position + " `" + shorten(info.title) + "`"
+                + "\n(Ссылка: " + info.uri + ")"
+                + "\nАвтор: `" + info.author + "` [`" + TimeFormat.format(track.getDuration()) + "`]\n";
+    }
+
+    private static String shorten(String title) {
+        return title.length() <= MAX_TITLE_LENGTH ? title : title.substring(0, MAX_TITLE_LENGTH - 1) + "…";
     }
 
     @Override
@@ -100,12 +75,7 @@ public class QueueCommand implements ICommand {
     }
 
     @Override
-    public Groups getGroup() {
-        return Groups.MUSIC;
-    }
-
-    @Override
     public List<String> getAliases() {
-        return List.of("q", "Q");
+        return List.of("q");
     }
 }

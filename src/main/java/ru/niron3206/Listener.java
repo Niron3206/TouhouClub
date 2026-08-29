@@ -24,10 +24,9 @@ public class Listener extends ListenerAdapter {
 
         if(user.isBot() || event.isWebhookMessage() || !event.isFromGuild()) return;
 
-        String prefix = Config.get("PREFIX");
         String raw = event.getMessage().getContentRaw();
 
-        if(raw.startsWith(prefix)) {
+        if(raw.startsWith(Config.prefix())) {
             manager.handle(event);
         }
     }
