@@ -258,12 +258,12 @@ public class LavalinkManager {
                         event.getTrack().getInfo().getIdentifier(), event.getException().getMessage()));
 
         client.on(TrackStuckEvent.class).subscribe(event -> {
-            TrackInfo info = event.getTrack().getInfo();
+            Track track = event.getTrack();
 
-            LOG.warn("Трек {} завис более чем на {} мс", info.getIdentifier(), event.getThresholdMs());
+            LOG.warn("Трек {} завис более чем на {} мс", track.getInfo().getIdentifier(), event.getThresholdMs());
 
-            getMusic(event.getGuildId()).announce("🔴 Трек `" + info.getTitle() + "` завис, пропускаю.");
-            nextTrack(event.getGuildId());
+            // ютуб перебирает клиентов дольше порога, со второй попытки обычно отдаёт поток
+            retryOrSkip(event.getGuildId(), track, "🔴 Трек `" + track.getInfo().getTitle() + "` завис, пропускаю.");
         });
 
         client.on(WebSocketClosedEvent.class).subscribe(event ->
@@ -285,14 +285,7 @@ public class LavalinkManager {
         }
 
         if (reason == AudioTrackEndReason.LOAD_FAILED) {
-            if (music.markRetried(info.getIdentifier())) {
-                LOG.info("Повторная попытка для {}", info.getIdentifier());
-                play(guildId, track.makeClone());
-                return;
-            }
-
-            music.announce("🔴 Не смог проиграть `" + info.getTitle() + "`, пропускаю.");
-            nextTrack(guildId);
+            retryOrSkip(guildId, track, "🔴 Не смог проиграть `" + info.getTitle() + "`, пропускаю.");
             return;
         }
 
@@ -302,6 +295,20 @@ public class LavalinkManager {
             return;
         }
 
+        nextTrack(guildId);
+    }
+
+    // одна попытка на трек на все виды сбоев. вторая неудача, тогда пропуск
+    private void retryOrSkip(long guildId, Track track, String skipMessage) {
+        String identifier = track.getInfo().getIdentifier();
+
+        if (getMusic(guildId).markRetried(identifier)) {
+            LOG.info("Повторная попытка для {}", identifier);
+            play(guildId, track.makeClone());
+            return;
+        }
+
+        getMusic(guildId).announce(skipMessage);
         nextTrack(guildId);
     }
 

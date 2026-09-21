@@ -5,6 +5,13 @@ server:
 lavalink:
   server:
     password: "${LAVALINK_PASSWORD:youshallnotpass}"
+    # 3 секунд по умолчанию до googlevideo не хватает
+    timeouts:
+      connectTimeoutMs: 10000
+      connectionRequestTimeoutMs: 10000
+      socketTimeoutMs: 15000
+    # с такими таймаутами 10 секунд по умолчанию объявляют зависшим живой трек
+    trackStuckThresholdMs: 15000
     sources:
       # ютуб отдаёт плагин, встроенный источник выключен
       youtube: false
@@ -15,8 +22,7 @@ lavalink:
       http: true
       local: false
   plugins:
-    # та же версия, что играла в боте
-    - dependency: "dev.lavalink.youtube:youtube-plugin:f45bbb7aebfcbc1c553769e04af6cd43afa8b7c3"
+    - dependency: "dev.lavalink.youtube:youtube-plugin:2be8e542d3f6f178e048dca565892684c2e40177"
       repository: "https://maven.lavalink.dev/snapshots"
       snapshot: true
 
