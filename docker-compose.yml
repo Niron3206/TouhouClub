@@ -1,13 +1,54 @@
+networks:
+  default:
+    ipam:
+      config:
+        # фиксированная подсеть, чтобы у doh был постоянный адрес для dns:
+        - subnet: 172.28.0.0/24
+
 services:
+  # dns over https для российских хостингов
+  doh:
+    image: cloudflare/cloudflared:2026.1.2
+    container_name: touhouclub-doh
+    command: >
+      proxy-dns
+      --address 0.0.0.0
+      --port 53
+      --upstream https://1.1.1.1/dns-query
+      --upstream https://8.8.8.8/dns-query
+    networks:
+      default:
+        ipv4_address: 172.28.0.53
+    restart: unless-stopped
+
   yt-cipher:
     image: ghcr.io/kikkia/yt-cipher:master
     container_name: touhouclub-cipher
     environment:
       - OVERRIDE_PLAYER_VARIANT=IAS
-    # ходит к ютубу сам, поэтому резолверы нужны ему не меньше, чем боту
+    # ходит к ютубу сам, поэтому резолвер нужен ему не меньше, чем узлу
     dns:
-      - 1.1.1.1
-      - 8.8.8.8
+      - 172.28.0.53
+    depends_on:
+      - doh
+    restart: unless-stopped
+
+  # ютуб и голос теперь на узле, поэтому резолвер и токен нужны ему
+  lavalink:
+    image: ghcr.io/lavalink-devs/lavalink:4
+    container_name: touhouclub-lavalink
+    env_file: .env
+    environment:
+      - YT_CIPHER_URL=http://yt-cipher:8001
+      # не кэшировать неудачный резолв: один сбой иначе выкашивает всю очередь
+      - _JAVA_OPTIONS=-Dnetworkaddress.cache.negative.ttl=0
+    volumes:
+      - ./lavalink/application.yml:/opt/Lavalink/application.yml:ro
+    dns:
+      - 172.28.0.53
+    depends_on:
+      - doh
+      - yt-cipher
     restart: unless-stopped
 
   bot:
@@ -15,11 +56,10 @@ services:
     container_name: touhouclub
     env_file: .env
     environment:
-      - YT_CIPHER_URL=http://yt-cipher:8001
-    depends_on:
-      - yt-cipher
-    # свои резолверы, т.к. на резолвере хоста ютуб отваливался пачками
+      - LAVALINK_URL=ws://lavalink:2333
     dns:
-      - 1.1.1.1
-      - 8.8.8.8
+      - 172.28.0.53
+    depends_on:
+      - doh
+      - lavalink
     restart: unless-stopped

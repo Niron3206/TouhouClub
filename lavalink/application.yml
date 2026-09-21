@@ -1,0 +1,36 @@
+server:
+  address: 0.0.0.0
+  port: 2333
+
+lavalink:
+  server:
+    password: "${LAVALINK_PASSWORD:youshallnotpass}"
+    sources:
+      # ютуб отдаёт плагин, встроенный источник выключен
+      youtube: false
+      bandcamp: true
+      soundcloud: true
+      twitch: true
+      vimeo: true
+      http: true
+      local: false
+  plugins:
+    # та же версия, что играла в боте
+    - dependency: "dev.lavalink.youtube:youtube-plugin:f45bbb7aebfcbc1c553769e04af6cd43afa8b7c3"
+      repository: "https://maven.lavalink.dev/snapshots"
+      snapshot: true
+
+plugins:
+  youtube:
+    enabled: true
+    clients: ["TV", "MUSIC", "TVHTML5_SIMPLY", "ANDROID_VR", "MWEB", "WEB", "WEBEMBEDDED"]
+    oauth:
+      enabled: true
+      refreshToken: "${YT_OAUTH_REFRESH_TOKEN:}"
+    remoteCipher:
+      url: "${YT_CIPHER_URL:http://yt-cipher:8001}"
+
+logging:
+  level:
+    root: INFO
+    lavalink: INFO

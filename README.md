@@ -3,9 +3,10 @@
 
 This is local Java project for discord bot, based on JDA library.
 
-**Requires Java 25.** Voice support relies on the DAVE protocol
-([JDAVE](https://github.com/MinnDevelopment/jdave)), which uses the FFM API and does not
-work on older JDKs. Discord blocks voice connections without DAVE.
+**Requires Java 25 and a [Lavalink](https://lavalink.dev) node.** Playback and the voice
+connection are handled by the node, not by the bot: Discord requires the DAVE protocol
+for voice, and Lavalink 4.2+ implements it. `docker compose` starts a node for you.
+The bot cannot play anything without one.
 
 You also have to specify token and prefix in `.env` file, which must be created in the root of the project.
 The easiest way to do it is to copy the `.env-example` and rename it to `.env`.
@@ -20,19 +21,24 @@ Don't forget to install maven if you haven't downloaded it yet:
 This produces a single self-contained `target/TouhouClub.jar` with all dependencies inside.
 
 Run it with `java -jar TouhouClub.jar`. Put your `.env` next to the jar, or pass
-`TOKEN` and `PREFIX` through the environment.
+`TOKEN` and `PREFIX` through the environment. Point `LAVALINK_URL` and
+`LAVALINK_PASSWORD` at your node.
 
 ## Docker
 
 `docker compose up -d --build`
 
-This starts the bot together with the cipher server it needs for YouTube,
-wiring them on a shared network. Put your `.env` next to `docker-compose.yml`.
+This starts three services on a shared network: the bot, a Lavalink node and the
+cipher server the node needs for YouTube. Put your `.env` next to `docker-compose.yml`.
 The image builds the project itself, so a local JDK is not required.
+
+The node reads `lavalink/application.yml`, which pins the youtube-source plugin and
+picks up `YT_OAUTH_REFRESH_TOKEN` and `YT_CIPHER_URL` from the environment.
 
 ## YouTube playback
 
-YouTube does not serve audio to anonymous requests, you will see
+YouTube is served by the youtube-source plugin **on the Lavalink node**, configured in
+`lavalink/application.yml`. It does not serve audio to anonymous requests, you will see
 `Sign in to confirm you're not a bot` or `This video requires login`.
 Two settings are needed, and they only work together:
 

@@ -1,15 +1,16 @@
 package ru.niron3206.util;
 
-import com.sedmelluq.discord.lavaplayer.tools.Units;
-
 import java.util.concurrent.TimeUnit;
 
 public final class TimeFormat {
 
     private TimeFormat() {}
 
+    // мм:сс
+    // для треков длиннее часа ч:мм:сс
+    // для стримов --:--
     public static String format(long millis) {
-        if (millis < 0 || millis == Units.DURATION_MS_UNKNOWN) {
+        if (millis <= 0 || millis == Long.MAX_VALUE) {
             return "--:--";
         }
 

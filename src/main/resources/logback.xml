@@ -15,6 +15,5 @@
 
     <!-- шумят на каждом событии гейтвея -->
     <logger name="net.dv8tion.jda.internal.requests.WebSocketClient" level="WARN"/>
-    <logger name="net.dv8tion.jda.api.audio" level="INFO"/>
 
 </configuration>

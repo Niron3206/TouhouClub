@@ -1,9 +1,9 @@
 package ru.niron3206.cmds.music;
 
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
+import dev.arbjerg.lavalink.client.player.Track;
+import dev.arbjerg.lavalink.protocol.v4.TrackInfo;
 import net.dv8tion.jda.api.entities.Message;
-import ru.niron3206.audioplayer.MusicManager;
+import ru.niron3206.audioplayer.GuildMusic;
 import ru.niron3206.cmds.CommandContext;
 import ru.niron3206.util.TimeFormat;
 
@@ -18,8 +18,8 @@ public class QueueCommand extends MusicCommand {
     private static final int TAIL_RESERVE = 40;
 
     @Override
-    protected void handleMusic(CommandContext ctx, MusicManager musicManager) {
-        List<AudioTrack> tracks = new ArrayList<>(musicManager.scheduler.queue);
+    protected void handleMusic(CommandContext ctx, GuildMusic music) {
+        List<Track> tracks = new ArrayList<>(music.queue);
 
         if (tracks.isEmpty()) {
             ctx.getChannel().sendMessage("Очередь пуста").queue();
@@ -29,7 +29,7 @@ public class QueueCommand extends MusicCommand {
         ctx.getChannel().sendMessage(buildText(tracks)).queue();
     }
 
-    static String buildText(List<AudioTrack> tracks) {
+    static String buildText(List<Track> tracks) {
         StringBuilder text = new StringBuilder("📃 **Следующие треки:**\n");
         int shown = 0;
 
@@ -52,12 +52,13 @@ public class QueueCommand extends MusicCommand {
         return text.toString();
     }
 
-    private static String format(int position, AudioTrack track) {
-        AudioTrackInfo info = track.getInfo();
+    private static String format(int position, Track track) {
+        TrackInfo info = track.getInfo();
 
-        return "#" + position + " `" + shorten(info.title) + "`"
-                + "\n(Ссылка: " + info.uri + ")"
-                + "\nАвтор: `" + info.author + "` [`" + TimeFormat.format(track.getDuration()) + "`]\n";
+        return "#" + position + " `" + shorten(info.getTitle()) + "`"
+                + "\n(Ссылка: " + info.getUri() + ")"
+                + "\nАвтор: `" + info.getAuthor() + "` [`"
+                + (info.isStream() ? "стрим" : TimeFormat.format(info.getLength())) + "`]\n";
     }
 
     private static String shorten(String title) {

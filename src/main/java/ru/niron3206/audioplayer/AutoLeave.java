@@ -57,26 +57,27 @@ public class AutoLeave {
                 return;
             }
 
-            MusicManager musicManager = PlayerManager.getInstance().getMusicManager(guild);
+            long guildId = guild.getIdLong();
+            LavalinkManager lavalink = LavalinkManager.getInstance();
 
-            boolean nothingToPlay = musicManager.audioPlayer.getPlayingTrack() == null
-                    && musicManager.scheduler.queue.isEmpty();
+            boolean nothingToPlay = lavalink.getPlayingTrack(guildId) == null
+                    && lavalink.getMusic(guildId).queue.isEmpty();
             // сам бот тоже числится участником канала, поэтому считаем только людей
             boolean noListeners = channel.getMembers().stream()
                     .noneMatch(member -> !member.getUser().isBot());
 
             if (noListeners) {
                 LOG.debug("Выхожу из канала {}: слушателей не осталось", channel.getId());
-                leave(guild, musicManager);
+                leave(guild);
                 return;
             }
 
             if (!nothingToPlay) {
-                IDLE_CHECKS.remove(guild.getIdLong());
+                IDLE_CHECKS.remove(guildId);
                 return;
             }
 
-            int idleChecks = IDLE_CHECKS.merge(guild.getIdLong(), 1, Integer::sum);
+            int idleChecks = IDLE_CHECKS.merge(guildId, 1, Integer::sum);
 
             if (idleChecks < 2) {
                 LOG.debug("Канал {} простаивает, жду ещё одну проверку", channel.getId());
@@ -84,17 +85,23 @@ public class AutoLeave {
             }
 
             LOG.debug("Выхожу из канала {}: играть нечего", channel.getId());
-            leave(guild, musicManager);
+            leave(guild);
         } catch (Exception e) {
             LOG.error("Проверка голосового канала сервера {} сорвалась", guild.getId(), e);
         }
     }
 
-    private static void leave(Guild guild, MusicManager musicManager) {
-        musicManager.scheduler.looping = false;
-        musicManager.scheduler.queue.clear();
-        musicManager.audioPlayer.stopTrack();
-        guild.getAudioManager().closeAudioConnection();
+    // чистит очередь,гасит плеер на узле и уводит бота из канала
+    public static void leave(Guild guild) {
+        long guildId = guild.getIdLong();
+        LavalinkManager lavalink = LavalinkManager.getInstance();
+        GuildMusic music = lavalink.getMusic(guildId);
+
+        music.looping = false;
+        music.queue.clear();
+
+        lavalink.getLink(guildId).destroy().subscribe();
+        guild.getJDA().getDirectAudioController().disconnect(guild);
 
         cancel(guild);
     }

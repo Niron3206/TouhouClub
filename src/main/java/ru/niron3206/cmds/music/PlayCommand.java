@@ -6,12 +6,11 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.entities.channel.unions.AudioChannelUnion;
-import net.dv8tion.jda.api.managers.AudioManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.niron3206.Config;
 import ru.niron3206.audioplayer.AutoLeave;
-import ru.niron3206.audioplayer.PlayerManager;
+import ru.niron3206.audioplayer.LavalinkManager;
 import ru.niron3206.cmds.CommandContext;
 import ru.niron3206.cmds.Groups;
 import ru.niron3206.cmds.ICommand;
@@ -22,7 +21,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-// отдельный случай от MusicCommand
 public class PlayCommand implements ICommand {
 
     private static final Logger LOG = LoggerFactory.getLogger(PlayCommand.class);
@@ -47,9 +45,15 @@ public class PlayCommand implements ICommand {
             return;
         }
 
-        AudioManager audioManager = ctx.getGuild().getAudioManager();
+        // узел поднимается дольше бота, до этого играть нечем
+        if (!LavalinkManager.getInstance().isNodeAvailable()) {
+            channel.sendMessage("🔴 Музыкальный сервер ещё не поднялся, попробуй чуть позже...").queue();
+            return;
+        }
 
-        if (!audioManager.isConnected()) {
+        GuildVoiceState selfVoiceState = ctx.getGuild().getSelfMember().getVoiceState();
+
+        if (selfVoiceState == null || !selfVoiceState.inAudioChannel()) {
             if (!connect(ctx, channel, memberVoiceState.getChannel())) {
                 return;
             }
@@ -58,7 +62,7 @@ public class PlayCommand implements ICommand {
         String fileName = audioAttachmentName(attachments);
 
         if (fileName != null) {
-            PlayerManager.getInstance()
+            LavalinkManager.getInstance()
                     .loadAndPlay(channel, attachments.get(0).getUrl(), member.getEffectiveName(), fileName);
             return;
         }
@@ -74,7 +78,7 @@ public class PlayCommand implements ICommand {
             link = "ytsearch:" + link;
         }
 
-        PlayerManager.getInstance().loadAndPlay(channel, link, member.getEffectiveName(), null);
+        LavalinkManager.getInstance().loadAndPlay(channel, link, member.getEffectiveName(), null);
     }
 
     private boolean connect(CommandContext ctx, GuildMessageChannel channel, AudioChannelUnion target) {
@@ -85,15 +89,13 @@ public class PlayCommand implements ICommand {
             return false;
         }
 
-        AudioManager audioManager = ctx.getGuild().getAudioManager();
-
-        audioManager.setSendingHandler(PlayerManager.getInstance().getMusicManager(ctx.getGuild()).getHandler());
-
         channel.sendMessageFormat("🔌 Подключаюсь к `🔊 %s`", target.getName()).queue();
-        audioManager.openAudioConnection(target);
+
+        // голосовым соединением занимается узел Lavalink, JDA только отдаёт ему обновления
+        ctx.getGuild().getJDA().getDirectAudioController().connect(target);
         AutoLeave.watch(ctx.getGuild());
 
-        LOG.debug("Подключение к {}: статус {}", target.getId(), audioManager.getConnectionStatus());
+        LOG.debug("Подключение к {} передано Lavalink", target.getId());
 
         return true;
     }

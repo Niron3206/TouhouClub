@@ -13,12 +13,8 @@
         <maven.compiler.release>25</maven.compiler.release>
 
         <jda.version>6.5.0</jda.version>
-        <jdave.version>0.1.8</jdave.version>
-        <lavaplayer.version>2.2.7</lavaplayer.version>
-        <!--
-            починено в PR #233, в релиз ещё не вошло. версия прибита к коммиту
-        -->
-        <youtube-source.version>f45bbb7aebfcbc1c553769e04af6cd43afa8b7c3-SNAPSHOT</youtube-source.version>
+        <!-- DAVE появился в 3.4.0, без него голос не поднимется -->
+        <lavalink-client.version>3.4.0</lavalink-client.version>
     </properties>
 
     <repositories>
@@ -52,31 +48,11 @@
             <artifactId>JDA</artifactId>
             <version>${jda.version}</version>
         </dependency>
-        <dependency>
-            <groupId>club.minnced</groupId>
-            <artifactId>jdave-native-linux-x86-64</artifactId>
-            <version>${jdave.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>club.minnced</groupId>
-            <artifactId>jdave-native-linux-aarch64</artifactId>
-            <version>${jdave.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>club.minnced</groupId>
-            <artifactId>jdave-native-win-x86-64</artifactId>
-            <version>${jdave.version}</version>
-        </dependency>
 
         <dependency>
             <groupId>dev.arbjerg</groupId>
-            <artifactId>lavaplayer</artifactId>
-            <version>${lavaplayer.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>dev.lavalink.youtube</groupId>
-            <artifactId>v2</artifactId>
-            <version>${youtube-source.version}</version>
+            <artifactId>lavalink-client</artifactId>
+            <version>${lavalink-client.version}</version>
         </dependency>
 
         <dependency>
@@ -114,12 +90,11 @@
                         <configuration>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
                             <transformers>
-                                <!-- lavaplayer и logback ищут реализации через META-INF/services -->
+                                <!-- logback и okhttp ищут реализации через META-INF/services -->
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <manifestEntries>
                                         <Main-Class>ru.niron3206.Main</Main-Class>
-                                        <Enable-Native-Access>ALL-UNNAMED</Enable-Native-Access>
                                     </manifestEntries>
                                 </transformer>
                             </transformers>

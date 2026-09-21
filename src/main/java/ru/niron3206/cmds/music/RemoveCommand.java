@@ -1,9 +1,9 @@
 package ru.niron3206.cmds.music;
 
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import dev.arbjerg.lavalink.client.player.Track;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import ru.niron3206.Config;
-import ru.niron3206.audioplayer.MusicManager;
+import ru.niron3206.audioplayer.GuildMusic;
 import ru.niron3206.cmds.CommandContext;
 
 import java.util.ArrayList;
@@ -12,7 +12,7 @@ import java.util.List;
 public class RemoveCommand extends MusicCommand {
 
     @Override
-    protected void handleMusic(CommandContext ctx, MusicManager musicManager) {
+    protected void handleMusic(CommandContext ctx, GuildMusic music) {
         GuildMessageChannel channel = ctx.getChannel();
         List<String> args = ctx.getArgs();
 
@@ -21,7 +21,7 @@ public class RemoveCommand extends MusicCommand {
             return;
         }
 
-        List<AudioTrack> tracks = new ArrayList<>(musicManager.scheduler.queue);
+        List<Track> tracks = new ArrayList<>(music.queue);
 
         if (tracks.isEmpty()) {
             channel.sendMessage("Очередь пуста").queue();
@@ -42,11 +42,11 @@ public class RemoveCommand extends MusicCommand {
             return;
         }
 
-        AudioTrack track = tracks.get(position - 1);
+        Track track = tracks.get(position - 1);
 
-        musicManager.scheduler.queue.remove(track);
+        music.queue.remove(track);
 
-        channel.sendMessage("🎵 Трек `" + track.getInfo().title + "` был удалён из очереди!").queue();
+        channel.sendMessage("🎵 Трек `" + track.getInfo().getTitle() + "` был удалён из очереди!").queue();
     }
 
     @Override
