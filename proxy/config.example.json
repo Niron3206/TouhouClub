@@ -1,0 +1,59 @@
+// скопировать в proxy/config.json и вписать свой VLESS в outbound "proxy"
+{
+  "log": { "loglevel": "warning" },
+  "dns": {
+    // doh напрямую, мимо туннеля
+    "servers": ["https+local://1.1.1.1/dns-query", "https+local://8.8.8.8/dns-query"]
+  },
+  "inbounds": [
+    {
+      // для узла, наружу не публикуется
+      "tag": "socks-in",
+      "listen": "0.0.0.0",
+      "port": 1080,
+      "protocol": "socks",
+      "settings": { "auth": "noauth", "udp": false }
+    },
+    {
+      // резолвер для dns
+      "tag": "dns-in",
+      "listen": "0.0.0.0",
+      "port": 53,
+      "protocol": "tunnel",
+      "settings": { "address": "1.1.1.1", "port": 53, "network": "tcp,udp" }
+    }
+  ],
+  "outbounds": [
+    {
+      // свой outbound сюда целиком, тег оставить "proxy"
+      "tag": "proxy",
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "<IP сервера>",
+            "port": 443,
+            "users": [{ "id": "<UUID>", "encryption": "none", "flow": "xtls-rprx-vision" }]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "serverName": "<SNI>",
+          "fingerprint": "chrome",
+          "publicKey": "<публичный ключ>",
+          "shortId": "<shortId>"
+        }
+      }
+    },
+    { "tag": "dns-out", "protocol": "dns" }
+  ],
+  "routing": {
+    "rules": [
+      { "inboundTag": ["dns-in"], "outboundTag": "dns-out" },
+      { "inboundTag": ["socks-in"], "outboundTag": "proxy" }
+    ]
+  }
+}

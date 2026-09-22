@@ -2,20 +2,20 @@ networks:
   default:
     ipam:
       config:
-        # фиксированная подсеть, чтобы у doh был постоянный адрес для dns:
+        # фиксированная подсеть, чтобы у proxy был постоянный адрес для dns:
         - subnet: 172.28.0.0/24
 
 services:
-  # dns over https для российских хостингов
-  doh:
-    image: cloudflare/cloudflared:2026.1.2
-    container_name: touhouclub-doh
-    command: >
-      proxy-dns
-      --address 0.0.0.0
-      --port 53
-      --upstream https://1.1.1.1/dns-query
-      --upstream https://8.8.8.8/dns-query
+  # vless-туннель для узла и DNS через DoH
+  proxy:
+    image: ghcr.io/xtls/xray-core:26.9.9
+    container_name: touhouclub-proxy
+    command: run -c /etc/xray/config.json
+    # ключи тут, файл в .gitignore, образец в proxy/config.example.json
+    volumes:
+      - ./proxy/config.json:/etc/xray/config.json:ro
+    sysctls:
+      - net.ipv4.ip_unprivileged_port_start=0
     networks:
       default:
         ipv4_address: 172.28.0.53
@@ -30,7 +30,7 @@ services:
     dns:
       - 172.28.0.53
     depends_on:
-      - doh
+      - proxy
     restart: unless-stopped
 
   # ютуб и голос теперь на узле, поэтому резолвер и токен нужны ему
@@ -40,14 +40,15 @@ services:
     env_file: .env
     environment:
       - YT_CIPHER_URL=http://yt-cipher:8001
-      # не кэшировать неудачный резолв: один сбой иначе выкашивает всю очередь
-      - _JAVA_OPTIONS=-Dnetworkaddress.cache.negative.ttl=0
+      # negative.ttl=0: один сбой резолва иначе выкашивает всю очередь
+      # socks: весь http узла через туннель, голос идёт напрямую
+      - _JAVA_OPTIONS=-Dnetworkaddress.cache.negative.ttl=0 -DsocksProxyHost=proxy -DsocksProxyPort=1080 -DsocksNonProxyHosts=yt-cipher|localhost|127.*
     volumes:
       - ./lavalink/application.yml:/opt/Lavalink/application.yml:ro
     dns:
       - 172.28.0.53
     depends_on:
-      - doh
+      - proxy
       - yt-cipher
     restart: unless-stopped
 
@@ -60,6 +61,6 @@ services:
     dns:
       - 172.28.0.53
     depends_on:
-      - doh
+      - proxy
       - lavalink
     restart: unless-stopped

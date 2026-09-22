@@ -28,9 +28,16 @@ Run it with `java -jar TouhouClub.jar`. Put your `.env` next to the jar, or pass
 
 `docker compose up -d --build`
 
-This starts three services on a shared network: the bot, a Lavalink node and the
-cipher server the node needs for YouTube. Put your `.env` next to `docker-compose.yml`.
+This starts four services on a shared network: the bot, a Lavalink node, the
+cipher server the node needs for YouTube and an [Xray](https://github.com/XTLS/Xray-core)
+proxy. Put your `.env` next to `docker-compose.yml`.
 The image builds the project itself, so a local JDK is not required.
+
+The proxy is for hosts, where YouTube does not work and YouTube DNS
+is spoofed. The node sends its HTTP traffic through a VLESS tunnel, voice goes direct (due to UDP).
+All containers resolve names through the proxy's DNS over HTTPS.
+Copy `proxy/config.example.json` to `proxy/config.json` and put your VLESS outbound
+there **before** `docker compose up`.
 
 The node reads `lavalink/application.yml`, which pins the youtube-source plugin and
 picks up `YT_OAUTH_REFRESH_TOKEN` and `YT_CIPHER_URL` from the environment.

@@ -1,3 +1,4 @@
 .idea/*
 .env
+proxy/config.json
 target/
