@@ -34,13 +34,19 @@ public class CommandManager {
 
         //music
         addCommand(new PlayCommand());
+        addCommand(new PauseCommand());
+        addCommand(new ResumeCommand());
         addCommand(new StopCommand());
         addCommand(new SkipCommand());
+        addCommand(new SeekCommand());
         addCommand(new NowPlayingCommand());
+        addCommand(new VolumeCommand());
         addCommand(new QueueCommand());
+        addCommand(new ShuffleCommand());
         addCommand(new LoopCommand());
         addCommand(new LeaveCommand());
         addCommand(new RemoveCommand());
+        addCommand(new ClearCommand());
     }
 
     private void addCommand(ICommand cmd) {

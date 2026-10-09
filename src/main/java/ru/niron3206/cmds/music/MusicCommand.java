@@ -1,20 +1,27 @@
 package ru.niron3206.cmds.music;
 
 import dev.arbjerg.lavalink.client.player.LavalinkPlayer;
+import dev.arbjerg.lavalink.client.player.PlayerUpdateBuilder;
 import dev.arbjerg.lavalink.client.player.Track;
 import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.entities.channel.unions.AudioChannelUnion;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.niron3206.audioplayer.GuildMusic;
 import ru.niron3206.audioplayer.LavalinkManager;
 import ru.niron3206.cmds.CommandContext;
 import ru.niron3206.cmds.Groups;
 import ru.niron3206.cmds.ICommand;
 
+import java.util.function.Consumer;
+
 // абстрактный класс для музыкальных команд
 // дети получают уже проверенный контекст и очередь гильдии
 public abstract class MusicCommand implements ICommand {
+
+    private static final Logger LOG = LoggerFactory.getLogger(MusicCommand.class);
 
     @Override
     public final void handle(CommandContext ctx) {
@@ -60,6 +67,21 @@ public abstract class MusicCommand implements ICommand {
 
     protected static LavalinkPlayer player(CommandContext ctx) {
         return LavalinkManager.getInstance().getPlayer(ctx.getGuild().getIdLong());
+    }
+
+    // шлёт изменение плеера на узел и отвечает, когда узел его принял
+    protected static void updatePlayer(CommandContext ctx, Consumer<PlayerUpdateBuilder> update, String reply) {
+        GuildMessageChannel channel = ctx.getChannel();
+
+        LavalinkManager.getInstance()
+                .getLink(ctx.getGuild().getIdLong())
+                .updatePlayer(update)
+                .subscribe(
+                        player -> channel.sendMessage(reply).queue(),
+                        error -> {
+                            LOG.warn("Узел не принял изменение плеера: {}", error.getMessage());
+                            channel.sendMessage("🔴 Музыкальный сервер не отвечает.").queue();
+                        });
     }
 
     // голосовой канал бота или null, если бот никуда не подключён

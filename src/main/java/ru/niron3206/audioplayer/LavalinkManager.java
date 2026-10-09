@@ -25,6 +25,8 @@ import net.dv8tion.jda.api.hooks.VoiceDispatchInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.niron3206.Config;
+import ru.niron3206.util.TimeFormat;
+import ru.niron3206.util.YoutubeLinks;
 
 import java.net.URI;
 import java.util.List;
@@ -41,6 +43,9 @@ public class LavalinkManager {
 
     private static final String DEFAULT_URL = "ws://lavalink:2333";
     private static final String DEFAULT_PASSWORD = "youshallnotpass";
+
+    // ключ userData с позицией старта
+    private static final String START_KEY = "start";
 
     private static volatile LavalinkManager instance;
 
@@ -162,8 +167,11 @@ public class LavalinkManager {
 
         getLink(guildId).loadItem(identifier).subscribe(result -> {
             if (result instanceof TrackLoaded loaded) {
-                queue(guildId, loaded.getTrack());
-                announceTrack(channel, loaded.getTrack(), member, fileName);
+                Track track = loaded.getTrack();
+                long start = applyStart(track, identifier);
+
+                queue(guildId, track);
+                announceTrack(channel, track, member, fileName, start);
                 return;
             }
 
@@ -176,7 +184,7 @@ public class LavalinkManager {
                 }
 
                 queue(guildId, tracks.get(0));
-                announceTrack(channel, tracks.get(0), member, fileName);
+                announceTrack(channel, tracks.get(0), member, fileName, 0);
                 return;
             }
 
@@ -224,7 +232,7 @@ public class LavalinkManager {
 
         music.clearRetried();
 
-        Track next = music.queue.poll();
+        Track next = music.next();
 
         if (next == null) {
             LOG.info("Очередь пуста, играть нечего");
@@ -236,7 +244,16 @@ public class LavalinkManager {
     }
 
     private void play(long guildId, Track track) {
-        getLink(guildId).updatePlayer(update -> update.setTrack(track)).subscribe(
+        long start = startOf(track);
+
+        getLink(guildId).updatePlayer(update -> {
+            update.setTrack(track);
+
+            // setTrack берёт позицию из info, а там 0
+            if (start > 0) {
+                update.setPosition(start);
+            }
+        }).subscribe(
                 player -> {},
                 error -> {
                     LOG.error("Не удалось запустить трек {}", track.getInfo().getIdentifier(), error);
@@ -312,13 +329,41 @@ public class LavalinkManager {
         nextTrack(guildId);
     }
 
-    private static void announceTrack(GuildMessageChannel channel, Track track, String member, String fileName) {
+    // отметка ?t= из ссылки ютуба едет с треком в userData до запуска,
+    // makeClone её копирует, поэтому повтор и loop тоже начинают с неё
+    private static long applyStart(Track track, String identifier) {
+        long start = YoutubeLinks.startTime(identifier);
+
+        if (start <= 0) {
+            return 0;
+        }
+
+        TrackInfo info = track.getInfo();
+
+        if (info.isStream() || !info.isSeekable() || start >= info.getLength()) {
+            LOG.info("Отметка {} мс не подходит для {}, играю с начала", start, info.getIdentifier());
+            return 0;
+        }
+
+        track.setUserData(Map.of(START_KEY, start));
+        return start;
+    }
+
+    private static long startOf(Track track) {
+        Object start = track.getUserData(Map.class).get(START_KEY);
+
+        return start instanceof Number number ? number.longValue() : 0;
+    }
+
+    private static void announceTrack(GuildMessageChannel channel, Track track, String member, String fileName, long start) {
         TrackInfo info = track.getInfo();
         String title = fileName != null ? fileName : info.getTitle();
+        String startLine = start > 0 ? "\nС отметки: `" + TimeFormat.format(start) + "`" : "";
 
         channel.sendMessage("Добавляю в очередь: `" + title
-                        + "`\nАвтор: `" + info.getAuthor()
-                        + "`\nПоставил: `" + member + "`")
+                        + "`\nАвтор: `" + info.getAuthor() + "`"
+                        + startLine
+                        + "\nПоставил: `" + member + "`")
                 .queue();
     }
 
