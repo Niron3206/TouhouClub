@@ -8,7 +8,7 @@ public class StopCommand extends MusicCommand {
 
     @Override
     protected void handleMusic(CommandContext ctx, GuildMusic music) {
-        music.queue.clear();
+        music.clear();
 
         LavalinkManager.getInstance()
                 .getLink(ctx.getGuild().getIdLong())

@@ -98,7 +98,7 @@ public class AutoLeave {
         GuildMusic music = lavalink.getMusic(guildId);
 
         music.looping = false;
-        music.queue.clear();
+        music.clear();
 
         lavalink.getLink(guildId).destroy().subscribe();
         guild.getJDA().getDirectAudioController().disconnect(guild);
